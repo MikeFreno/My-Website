@@ -1,0 +1,143 @@
+
+{% include "header.html" %}
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{url_for('home')}}" style="border-bottom: none;">
+      <img src="{{ url_for('static', filename='images/favicon.ico')}}" alt="Logo" width="24" height="24" class="d-inline-block align-text-top">
+      Mike Freno</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mt-auto">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{{url_for('home')}}" style="border-bottom: none;">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{{url_for('projects')}}" style="border-bottom: none;">Projects</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('blog')}}" style="border-bottom: none;">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('contact')}}" style="border-bottom: none;">Contact</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle-end active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-bottom: none;">
+            {% if logged_in: %}
+              <div class="accountImage me-auto">
+                {% if user.profile_picture==None %}
+                  <img src="{{ user.email | gravatar }}"/><br>
+                {% else %}
+                  <img src="{{ user.profile_picture }}" class="accountImageCropped"/><br>
+              {% endif %}
+              </div>{% endif %}
+            {% if not logged_in: %}Account{% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            {% if not logged_in: %}
+            <li><a class="dropdown-item" href="{{url_for('login')}}">Login</a></li>
+            <li><a class="dropdown-item" href="{{url_for('register')}}">Register</a></li>
+            {% endif %}
+            {% if logged_in: %}
+            <li><h6 class="dropdown-header">@{{ user.name }}</h6></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item active" href="{{url_for('settings')}}">Account Settings</a></li>
+            <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
+            {% endif %}
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="row text-center">
+  <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist" >
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">General Settings</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Security</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Delete Account</button>
+    </li>
+  </ul>
+  {% with messages = get_flashed_messages() %}
+      {% if messages %}
+       {% for message in messages %}
+       <p style="color:red">{{ message }}</p>
+       {% endfor %}
+      {% endif %}
+    {% endwith %}
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0" >
+      Current Profile Picture<br>
+      {% if user.profile_picture==None %}
+        <img src="{{ user.email | gravatar }}"/><br>
+      {% else %}
+        <img src="{{ user.profile_picture }}" class="accountImageFull"/><br>
+      {% endif %}
+      Change Profile Picture:
+      <form id='form1' action="" method="post" enctype="multipart/form-data" novalidate>
+        <div class="form-group" >
+          <label for="img">Select Picture from device:</label>
+          <input type="file" id="img" name="file" accept="image/*" >
+          {{ picture_form.submit(class_="btn btn-dark") }}
+         </div>
+      </form>
+    </div>
+
+    <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+      <div style="text-align:center">
+      </div>
+      Change Password:
+      <div class="d-flex justify-content-center" id="page_form2">
+        <form id='form2' action="" method="post" novalidate>
+              {{ password_form.hidden_tag() }}
+              <div class="col-16">
+                <div class="form-group">
+                    {{ password_form.confirm_old_password.label }}
+                    {{ password_form.confirm_old_password(class_="form-control", style_="color:white") }}
+                </div><br>
+              </div>
+              <div class="col-16">
+                <div class="form-group">
+                    {{ password_form.new_password.label }}
+                    {{ password_form.new_password(class_="form-control", style_="color:white") }}
+                </div><br>
+              </div>
+              <div class="col-16">
+                <div class="form-group">
+                    {{ password_form.confirm_new_password.label }}
+                    {{ password_form.confirm_new_password(class_="form-control", style_="color:white") }}
+                </div><br>
+                <div class="col-3">
+                  {{ password_form.submit(class_="btn btn-dark") }}
+                </div>
+              </div>
+        </form>
+      </div>
+    </div>
+
+
+    </div>
+    <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+    <div class="d-flex justify-content-center" id="page_form">
+        <form id='form3' action="" method="post" novalidate>
+              {{ delete_form.hidden_tag() }}
+          <div class="col-16">
+            <div class="form-group">
+                {{ delete_form.password.label }}
+                {{ delete_form.password(class_="form-control", style_="color:white") }}
+            </div><br>
+            <div class="col-3">
+              {{ delete_form.submit(class_="btn btn-dark") }}
+            </div>
+          </div>
+        </form>
+    </div>
+  </div>
+
+</div>
+{% include "footer.html" %}

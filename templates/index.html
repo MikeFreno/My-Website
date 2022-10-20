@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Mike Freno</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="icon" href="static/images/favicon.ico">
+		<link rel="stylesheet" href="static/assets/css/main.css" />
+		<link href="{{ url_for('static', filename='css/styles.css')}}" rel="stylesheet">
+		<noscript><link rel="stylesheet" href="static/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="content">
+							<div class="inner">
+								<h1>Mike Freno</h1>
+								<p>A Programmer.</p>
+							</div>
+						</div>
+						<nav>
+							<ul>
+								<li><a href="#intro">Intro</a></li>
+								<li><a href="{{url_for('projects')}}">Projects</a></li>
+								<li><a href="{{url_for('blog')}}">Blog</a></li>
+								<li><a href="#contact">Contact</a></li>
+							</ul>
+						</nav>
+					</header>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Intro -->
+							<article id="intro">
+								<h2 class="major">Intro</h2>
+								<span class="image main"><img src="static/images/me in flannel.jpg" alt="" /></span>
+								<p>My name is Mike Freno, and I'm a software developer. I came to this profession in a nonlinear path.
+									First going to Rutgers University for a bachelor's in genetics, before becoming disillusioned with academia (originally was planning on pursuing a PhD).
+									While searching for other career paths I developed an interest in business and finance, before settling in on programming. I had taken a course on java
+									during my undergraduate and have had a lifelong interest in computers(building many myself) and how it all worked, so in someways its odd I hadn't
+									gone down this career path earlier.</p>
+								<p>This website serves as a display of some of my technical skills some of which you can find <a href="{{url_for('projects')}}">here</a>.
+									As well as a place for me to write about things that interest me, mostly surrounding <a href="{{url_for('blog')}}">bitcoin, economics and other tech related topics</a>.</p>
+							</article>
+
+						<!-- Work -->
+							<article id="projects">
+								<h2 class="major">Projects</h2>
+								<span class="image main"><img src="static/images/pre-ps.jpg" alt="" /></span>
+								<p>I have listed and tutorial-ized a number of programming projects that I have completed, to chronicle my growth and in the hopes someone might get something out of one.
+									You can check out all my projects <a href="{{url_for('projects')}}">here.</a><br><hr>Links to specific categories:</p><hr>
+								<ul>
+									<li><a href="#">Python Projects</a></li>
+									<li><a href="#">Android Apps</a></li>
+									<li><a href="#">Emailers</a></li>
+									<li><a href="#">Data Analysis</a></li>
+									<li><a href="#">Hardware Projects</a></li>
+									<li><a href="#">Other Websites</a></li>
+								</ul>
+							</article>
+						<!-- About -->
+							<article id="blog">
+								<h2 class="major">Blog</h2>
+								<span class="image main"><img src="static/images/home_blog_cover.jpg" alt="" /></span>
+								<p>I write about bitcoin, economics, and other tech related topics, feel free to read, comment and hopefully learn something useful. <a href="{{url_for('blog')}}">Check it out!</a> </p>
+							</article>
+
+						<!-- Contact -->
+							<article id="contact">
+								<div class="container text-left">
+									<h2 class="major">Contact</h2>
+									<p>Reach out to me and I will get back to you as soon as I can!</p>
+									<form id='comment' action="" method="post" novalidate>
+										{{ form.hidden_tag() }}
+										<div class="row justify-content-md-left">
+											<div class="col col-lg-3">
+											  {{ form.name.label }}
+											  {%  if logged_in: %}
+												<input type="email" class="form-control" name="name" value="{{user.name.replace('_',' ')}}" style="color:white;background-color:rgba(27, 31, 34, 0.85)">
+											  {% else: %}
+												<input type="email" class="form-control" name="name" placeholder="John Doe" style="color:white;background-color:rgba(27, 31, 34, 0.85)">
+											  {% endif %}
+											</div>
+											<div class="col-lg-4">
+											  {{ form.email.label }}
+											  {%  if logged_in: %}
+												<input type="email" class="form-control" name="email" value="{{user.email}}" style="color:white;background-color:rgba(27, 31, 34, 0.85)">
+											  {% else: %}
+												<input type="email" class="form-control" name="email" placeholder="name@example.com" style="color:white;background-color:rgba(27, 31, 34, 0.85)">
+											  {% endif %}
+											</div>
+										</div>
+										<br>
+										<div class="row justify-content-md-left">
+										  <div class="col-lg-8">
+											  {{ form.message.label }}
+											<textarea class="form-control" name="message" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)"></textarea>
+										  </div>
+										</div>
+										<br>
+										<div class="row justify-content-md-left">
+										  <div class="col-2">
+											{{ form.submit }}
+										</div>
+										</div>
+									</form>
+									{% with messages = get_flashed_messages() %}
+									  {% if messages %}
+									   {% for message in messages %}
+									   <h4 style="color:white">{{ message }}</h4>
+									   {% endfor %}
+									  {% endif %}
+									{% endwith %}
+								</div>
+								<ul class="icons">
+									<li><a href="https://github.com/MikeFreno/" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+									<li><a href="https://www.linkedin.com/in/michael-freno-4711bb246/" id="li_logo" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
+									<li><a href="https://twitter.com/frenomike/" id="tw_logo" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+									<li><a href="https://instagram.com/mikefreno" id="ig_logo" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+								</ul>
+							</article>
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy;{{year}}. Michael Freno.</p>
+					</footer>
+			</div>
+		<!-- BG -->
+			<div id="bg"></div>
+		<!-- Scripts -->
+			<script src="static/assets/js/jquery.min.js"></script>
+			<script src="static/assets/js/browser.min.js"></script>
+			<script src="static/assets/js/breakpoints.min.js"></script>
+			<script src="static/assets/js/util.js"></script>
+			<script src="static/assets/js/main.js"></script>
+
+	</body>
+</html>

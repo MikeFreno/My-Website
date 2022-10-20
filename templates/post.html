@@ -1,0 +1,158 @@
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% include "header.html" %}
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{url_for('home')}}" style="border-bottom: none;">
+      <img src="{{ url_for('static', filename='images/favicon.ico')}}" alt="Logo" width="24" height="24" class="d-inline-block align-text-top">
+      Mike Freno</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mt-auto">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{{url_for('home')}}" style="border-bottom: none;">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{{url_for('projects')}}" style="border-bottom: none;">Projects</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{{url_for('blog')}}" style="border-bottom: none;">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('contact')}}" style="border-bottom: none;">Contact</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle-end" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-bottom: none;">
+            {% if logged_in: %}
+              <div class="accountImage me-auto">
+                {% if user.profile_picture==None %}
+                  <img src="{{ user.email | gravatar }}"/><br>
+                {% else %}
+                  <img src="../{{ user.profile_picture }}" class="accountImageCropped"/><br>
+              {% endif %}
+              </div>{% endif %}
+            {% if not logged_in: %}Account{% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            {% if not logged_in: %}
+            <li><a class="dropdown-item" href="{{url_for('login')}}">Login</a></li>
+            <li><a class="dropdown-item" href="{{url_for('register')}}">Register</a></li>
+            {% endif %}
+            {% if logged_in: %}
+            <li><h6 class="dropdown-header">@{{ user.name }}</h6></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{url_for('settings')}}">Account Settings</a></li>
+            <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
+            {% endif %}
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% if post.cover_photo.split('/')[0]=='static' %}
+<header class="masthead" style="background-image: url('../{{ post.cover_photo }}')">
+{% else %}
+<header class="masthead" style="background-image: url('{{ post.cover_photo }}')">
+{% endif %}
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="post-heading">
+          <h1>{{post.title}}</h1>
+          <h2 class="subheading">{{post.subtitle}}</h2>
+          <span class="meta">Posted by
+            <a href="#" style="border-bottom: none;">{{post.author.name.replace('_', ' ')}}</a>
+            on {{post.date}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- Post Content -->
+  <a href="{{ url_for('blog') }}" class='back' style="border-bottom: none;">&lt Back</a>
+ <article>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+          {{ post.body|safe }}
+        <hr>
+        {% if current_user.id == 1 %}
+         <div class="clearfix">
+        <a class="btn btn-dark float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
+        <a class="btn btn-dark float-right" href="{{url_for('delete_post', post_id=post.id)}}">Delete Post</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+     <a href="{{ url_for('blog') }}" class='back' style="border-bottom: none;">&lt Back</a>
+   <br>
+   {% if logged_in: %}
+     {{ ckeditor.load() }}
+     {{ ckeditor.config(name='body') }}
+     <div class="d-flex justify-content-center">
+      <form id='comment' action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="col-16">
+          <div class="form-group">
+              {{ form.body.label }}
+              {{ form.body(class_="form-control", style_="color:white") }}
+          </div><br>
+        </div>
+        <div class="col-3">
+              {{ form.submit(class_="btn btn-dark") }}
+        </div>
+      </form>
+     </div>
+   {% else %}
+   <div class="text-center">
+     <div class="row">
+       <h3>You must be logged in to post a comment.</h3><br></div>
+     <div class="row d-flex justify-content-center">
+       <div class="col-3">
+         <a href="{{url_for('login') }}" type="button" class="btn btn-dark">Login</a></div>
+       <div class="col-3">
+         <a href="{{url_for('register') }}" type="button" class="btn btn-dark">Register</a></div>
+     </div>
+   </div>
+   {% endif %}
+    <div class="col-md-10 mx-auto">
+      {% for comment in post.comments: %}
+        <ul class="commentList">
+          <li style="margin-left:8em;margin-right:8em;"><hr>
+            <div>
+              <p>{{ comment.body|safe}}
+              </p></div>
+            {% if comment.author == None %}
+              <div>[User Account Deleted]</div>
+              {% if comment.author.id == user.id or user.id == 1: %}
+                <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="position: relative;color:gray;margin-left:0.5em;"></a>
+              {% endif %}
+            {% else %}
+              <div class="accountImage me-auto">
+                {% if comment.author.profile_picture==None: %}
+                  <img src="{{ comment.author.email | gravatar }}"/><br>
+                {% else %}
+                  <img src="../{{ comment.author.profile_picture }}" class="accountImageCropped"/><br>
+                {% endif %}
+                {% if comment.author.id == user.id or user.id == 1: %}
+                  <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="position: relative;color:gray;margin-left:0.5em;"></a>
+                {% endif %}
+              </div>
+            <div>
+              <span class="date sub-text">-@{{ comment.author.name }}</span>
+            </div>
+            {% endif %}
+          </li>
+        </ul>
+      {% endfor %}
+      <span id="past_last"></span>
+      </div>
+ </article>
+
+
+{% include "footer.html" %}
