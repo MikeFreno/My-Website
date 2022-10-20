@@ -24,14 +24,14 @@ PP_UPLOAD_FOLDER = 'static/uploads/profile_pictures'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SECRET_KEY'] = '#@4DFsdf;[34AsD1SKb'
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 app.config['MAX_CONTENT_LENGTH'] = 32 * 1000 * 1000
 app.config['PP_FOLDER'] = PP_UPLOAD_FOLDER
 
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL","sqlite:///site.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 gravatar = Gravatar(app, size=100, rating='g', default='identicon', force_default=False, force_lower=False,
