@@ -521,9 +521,7 @@ def send_contact_email(name, email, message):
 
     with smtplib.SMTP('127.0.0.1', 1025) as mail:
         mail.login(HOST, "tXjNAnDw6-iPHSs1yf1Cag")
-        print("Successful login")
         mail.sendmail(HOST, RECEIVER, msg.as_string())
-        print("Successfully sent mail.")
 
     return redirect(url_for('home', _anchor="contact"))
 
