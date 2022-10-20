@@ -4,7 +4,7 @@ from flask_ckeditor import CKEditor, CKEditorField
 from datetime import date, datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, BooleanField
-from wtforms.validators import DataRequired, URL, Email, Length
+from wtforms.validators import DataRequired, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
@@ -95,7 +95,7 @@ class User(UserMixin, db.Model):
 
 class ContactForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
-    email = StringField("Email", validators=[DataRequired(), Email()])
+    email = StringField("Email", validators=[DataRequired()])
     message = StringField("Message")
     submit = SubmitField("Send Message")
 
