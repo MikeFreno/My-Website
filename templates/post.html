@@ -9,7 +9,7 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav mt-auto">
         <li class="nav-item">
           <a class="nav-link" aria-current="page" href="{{url_for('home')}}" style="border-bottom: none;">Home</a>
@@ -73,7 +73,13 @@
   </div>
 </header>
 <!-- Post Content -->
-  <a href="{{ url_for('blog') }}" class='back' style="border-bottom: none;">&lt Back</a>
+<div class="container text-center">
+  <div class="row justify-content-md-left">
+    <div class="col col-lg-2">
+      <a href="{{ url_for('blog') }}" class='back' style="border-bottom: none;">&lt Back</a>
+    </div>
+  </div>
+</div>
  <article>
   <div class="container">
     <div class="row">
@@ -89,8 +95,13 @@
       </div>
     </div>
   </div>
-     <a href="{{ url_for('blog') }}" class='back' style="border-bottom: none;">&lt Back</a>
-   <br>
+<div class="container text-center">
+  <div class="row justify-content-md-left">
+    <div class="col col-lg-2">
+      <a href="{{ url_for('blog') }}" class='back' style="border-bottom: none;">&lt Back</a>
+    </div>
+  </div>
+</div><br>
    {% if logged_in: %}
      {{ ckeditor.load() }}
      {{ ckeditor.config(name='body') }}
