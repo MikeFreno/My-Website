@@ -531,10 +531,12 @@ def send_registration_email(name, email):
         from_email='michael@freno.me',
         to_emails=email,
         subject='Thank you!',
-        html_content=f'<h3>Hello {name}, and thanks for registering for my website!</h3><br> No other emails will be '
-                     f'sent to you, '
-                     f' outside of responses back for inquiry and any emailers that you decide to opt-in to(yet to be '
-                     f'implemented as of writing),<br>of which you can of course opt out of at anytime. Thanks again!')
+        html_content=f'<h4 style="text-align: center;"><img src="static/images/favicon.ico" '
+                     f'alt="logo">Mike Freno</h4><br><h2>Hello {name},<br> and thanks for registering for my website!</h2><br> '
+                     f'No other emails will be sent to you, '
+                     f' outside of responses back for inquiry and any emailers that you decide to opt-in to (yet to be '
+                     f'implemented as of writing), of which you can of course opt out of at anytime. <br> Thanks '
+                     f'again!<br> -Michael Freno')
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
