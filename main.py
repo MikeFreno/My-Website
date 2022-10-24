@@ -85,7 +85,7 @@ class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), unique=True)
-    password = db.Column(db.String(128))
+    password = db.Column(db.String(512))
     name = db.Column(db.String(128))
     profile_picture = db.Column(db.String(256), nullable=True)
     posts = relationship("BlogPost", back_populates="author")
