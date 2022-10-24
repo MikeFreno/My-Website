@@ -192,7 +192,7 @@ def home():
 def blog():
     posts = BlogPost.query.all()
     return render_template("blog.html", logged_in=current_user.is_authenticated, all_posts=posts,
-                           doy=datetime.now().timetuple().tm_yday, year=date.today().year, user=current_user)
+                           doy=datetime.now().timetuple().tm_yday, year=date.today().year, user=current_user, page="Blog")
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -201,13 +201,13 @@ def contact():
         if form.validate_on_submit():
             flash("Email Sent")
             send_contact_email(name=request.form['name'], email=request.form['email'], message=request.form['message'])
-    return render_template("contact_me.html", year=date.today().year, logged_in=current_user.is_authenticated, form=form, user=current_user)
+    return render_template("contact_me.html", year=date.today().year, logged_in=current_user.is_authenticated, form=form, user=current_user, page="Contact")
 
 @app.route('/projects')
 def projects():
     projects_ = Project.query.all()
     return render_template("projects.html", logged_in=current_user.is_authenticated, year=date.today().year,
-                           user=current_user, all_projects=projects_)
+                           user=current_user, all_projects=projects_, page="Projects")
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -235,7 +235,7 @@ def register():
             flash('Passwords do not match!')
             return redirect(url_for('register'))
     return render_template("register.html", form=form, logged_in=current_user.is_authenticated, year=date.today().year,
-                           user=current_user)
+                           user=current_user, page="Register")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -255,7 +255,7 @@ def login():
             flash('Email or password is invalid.')
             return redirect(url_for('login'))
     return render_template("login.html", form=form, logged_in=current_user.is_authenticated, year=date.today().year,
-                           user=current_user)
+                           user=current_user, page="Login")
 
 
 @app.route('/logout')
@@ -304,7 +304,7 @@ def settings():
             return redirect(url_for('home'))
     return render_template('settings.html', logged_in=current_user.is_authenticated, year=date.today().year,
                            user=current_user, picture_form=picture_form, password_form=password_form,
-                           delete_form=delete_form)
+                           delete_form=delete_form, page="Settings")
 
 
 
@@ -337,7 +337,7 @@ def add_new_blog():
         new = BlogPost.query.filter(BlogPost.title == new_post.title, BlogPost.subtitle == new_post.subtitle).first()
         return redirect(url_for('show_post', post_id=new.id))
     return render_template('new_blog_post.html', form=form, logged_in=current_user.is_authenticated,
-                           year=date.today().year, user=current_user)
+                           year=date.today().year, user=current_user, page="New Blog")
 
 
 @app.route("/edit_post/<int:post_id>", methods=['GET', 'POST'])
@@ -360,7 +360,7 @@ def edit_post(post_id):
         db.session.commit()
         return redirect(url_for('show_post', post_id=post_id))
     return render_template('new_blog_post.html', form=edit_form, logged_in=current_user.is_authenticated,
-                           year=date.today().year, user=current_user)
+                           year=date.today().year, user=current_user, page="Edit Blog")
 
 
 @app.route("/post/<int:post_id>", methods=['GET', 'POST'])
@@ -381,7 +381,7 @@ def show_post(post_id):
             flash('Must be logged in to comment')
             return redirect(url_for('login'))
     return render_template("post.html", post=requested_post, user=current_user, logged_in=current_user.is_authenticated,
-                           form=form)
+                           form=form, page="Blog")
 
 
 @app.route("/new-project", methods=['GET', 'POST'])
@@ -412,7 +412,7 @@ def add_new_project():
         new = Project.query.filter(Project.title == new_proj.title, Project.subtitle == new_proj.subtitle).first()
         return redirect(url_for('show_project', proj_id=new.id))
     return render_template('new_project.html', form=form, logged_in=current_user.is_authenticated,
-                           year=date.today().year, user=current_user)
+                           year=date.today().year, user=current_user, page="New Projects")
 
 
 @app.route("/edit_project/<int:proj_id>", methods=['GET', 'POST'])
@@ -435,7 +435,7 @@ def edit_project(proj_id):
         db.session.commit()
         return redirect(url_for("show_project", proj_id=project.id))
     return render_template('new_project.html', form=edit_form, logged_in=current_user.is_authenticated,
-                           year=date.today().year, user=current_user)
+                           year=date.today().year, user=current_user, page="Edit Project")
 
 
 @app.route("/project/<int:proj_id>", methods=['GET', 'POST'])
@@ -457,7 +457,7 @@ def show_project(proj_id):
             return redirect(url_for('login'))
 
     return render_template("project.html", proj=requested_proj, user=current_user,
-                           logged_in=current_user.is_authenticated, form=form)
+                           logged_in=current_user.is_authenticated, form=form, page="Projects")
 
 
 @app.route("/_deletepo/<int:post_id>", methods=['GET', 'POST', 'DELETE'])
