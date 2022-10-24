@@ -45,9 +45,9 @@ login_manager.init_app(app)
 class BlogPost(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(250), unique=False, nullable=False)
-    subtitle = db.Column(db.String(250), nullable=False)
-    date = db.Column(db.String(250), nullable=False)
+    title = db.Column(db.String(256), unique=False, nullable=False)
+    subtitle = db.Column(db.String(256), nullable=False)
+    date = db.Column(db.String(256), nullable=False)
     doy = db.Column(db.Integer, nullable=False)
     body = db.Column(db.Text, nullable=False)
     cover_photo = db.Column(db.String, unique=False, nullable=True)
@@ -59,11 +59,11 @@ class BlogPost(db.Model):
 class Project(db.Model):
     __tablename__ = "projects"
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(250), unique=False, nullable=False)
-    subtitle = db.Column(db.String(250), nullable=True)
+    title = db.Column(db.String(256), unique=False, nullable=False)
+    subtitle = db.Column(db.String(256), nullable=True)
     body = db.Column(db.Text, nullable=False)
     cover_photo = db.Column(db.String, unique=False, nullable=True)
-    date = db.Column(db.String(250), nullable=False)
+    date = db.Column(db.String(256), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = relationship("User", back_populates="projects")
     comments = relationship("Comment", back_populates="parent_project")
@@ -84,10 +84,10 @@ class Comment(db.Model):
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100))
-    name = db.Column(db.String(100))
-    profile_picture = db.Column(db.String(500), nullable=True)
+    email = db.Column(db.String(128), unique=True)
+    password = db.Column(db.String(128))
+    name = db.Column(db.String(128))
+    profile_picture = db.Column(db.String(256), nullable=True)
     posts = relationship("BlogPost", back_populates="author")
     comments = relationship("Comment", back_populates="author", lazy='dynamic', )
     projects = relationship("Project", back_populates="author")
@@ -514,7 +514,7 @@ def send_contact_email(name, email, message):
     msg.attach(msg_ready)
 
     with smtplib.SMTP('127.0.0.1', 1025) as mail:
-        mail.login(HOST, "tXjNAnDw6-iPHSs1yf1Cag")
+        mail.login(HOST, "broken")
         mail.sendmail(HOST, RECEIVER, msg.as_string())
 
     return redirect(url_for('home', _anchor="contact"))
