@@ -80,14 +80,15 @@
       <label for="img">Or Select image from device:</label>
       <input type="file" id="img" name="file" accept="image/*">
     </div>
-    <div class="col-32">
-      <div class="form-group" style="width: 60rem;">
+    <div class="col-lg-8">
+      <div class="form-group">
           {{ form.body.label }}
           {{ form.body(class_="form-control", id_="body") }}
       </div>
-    </div><br>
-    <div class="col-3">
+    <br>
+      <div class="col-3">
           {{ form.submit(class_="btn btn-dark") }}
+      </div>
     </div>
   </form>
 </div>

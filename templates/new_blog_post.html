@@ -54,48 +54,42 @@
   </div>
 </nav>
 
-<div class="container">
-  <div class="row">
-      {{ ckeditor.load() }}
+<div class="container text-left">
+  <form id='new-project' action="" method="post" novalidate>
+    {{ ckeditor.load() }}
       {{ ckeditor.config(name='body') }}
-
-      <div class="d-flex justify-content-center" id="page_form">
-        <form id='form' action="" method="post" enctype="multipart/form-data" novalidate>
-          {{ form.hidden_tag() }}
-          <div class="col-16">
-            <div class="form-group">
-                {{ form.title.label }}
-                {{ form.title(class_="form-control", style_="color:white", id_="title") }}
-            </div>
-          </div><br>
-          <div class="col-16">
-            <div class="form-group">
-                {{ form.subtitle.label }}
-                {{ form.subtitle(class_="form-control", style_="color:white", id_="subtitle") }}
-            </div>
-          </div><br>
-          <div class="col-16">
-            <div class="form-group">
-                {{ form.cover_photo.label }}
-                {{ form.cover_photo(class_="form-control", style_="color:white") }}
-            </div><br>
-            <div class="form-group" >
-              <label for="img">Or Select image from device:</label>
-              <input type="file" id="img" name="file" accept="image/*">
-            </div>
-          </div><br>
-          <div class="col-32">
-            <div class="form-group" style="width: 60rem;">
-                {{ form.body.label }}
-                {{ form.body(class_="form-control", id_="body") }}
-            </div>
-          </div><br>
-            <div class="col-3">
-              {{ form.submit(class_="btn btn-dark") }}
-            </div>
-        </form>
+    <div class="row justify-content-md-left">
+      {{ form.hidden_tag() }}
+      <div class="col col-lg-4">
+        {{ form.title.label }}
+        {{ form.title(class_="form-control", style_="color:white", id_="title") }}
       </div>
-  </div>
+      <div class="col-lg-4">
+        {{ form.subtitle.label }}
+        {{ form.subtitle(class_="form-control", style_="color:white", id_="subtitle") }}
+      </div>
+    </div><br>
+    <div class="row justify-content-md-left">
+      <div class="col-lg-8">
+         {{ form.cover_photo.label }}
+         {{ form.cover_photo(class_="form-control", style_="color:white") }}
+      </div><br>
+    </div>
+    <div class="row justify-content-md-left">
+      <label for="img">Or Select image from device:</label>
+      <input type="file" id="img" name="file" accept="image/*">
+    </div>
+    <div class="col-lg-8">
+      <div class="form-group">
+          {{ form.body.label }}
+          {{ form.body(class_="form-control", id_="body") }}
+      </div>
+    <br>
+      <div class="col-3">
+          {{ form.submit(class_="btn btn-dark") }}
+      </div>
+    </div>
+  </form>
 </div>
 
 {% include "footer.html" %}
