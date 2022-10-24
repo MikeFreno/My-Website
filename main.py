@@ -229,6 +229,7 @@ def register():
                 db.session.commit()
                 user_check = User.query.filter_by(email=form.email.data).first()
                 login_user(user_check)
+                send_registration_email(name=request.form['name'], email=form.email.data)
                 return redirect(url_for("settings"))
             except IntegrityError:
                 flash('Email already registered!')
@@ -519,6 +520,25 @@ def send_contact_email(name, email, message):
         print(response.headers)
     except Exception as e:
         print(e.message)
+
+def send_registration_email(name, email):
+    message = Mail(
+        from_email='michael@freno.me',
+        to_emails={email},
+        subject='Thank you!',
+        html_content=f'<h3>Hello {name}, and thanks for registering for my website!</h3><br> No other emails will be '
+                     f'sent to you, '
+                     f' outside of responses back for inquiry and any emailers that you decide to opt-in to(yet to be '
+                     f'implemented as of writing),<br>of which you can of course opt out of at anytime. Thanks again!')
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
+
 
 
 if __name__ == "__main__":
