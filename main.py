@@ -33,7 +33,8 @@ app.config['PP_FOLDER'] = PP_UPLOAD_FOLDER
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL","sqlite:///site.db").replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///site.db").replace("postgres://",
+                                                                                                    "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 gravatar = Gravatar(app, size=100, rating='g', default='identicon', force_default=False, force_lower=False,
@@ -187,14 +188,17 @@ def home():
         if form.validate_on_submit():
             flash("Email Sent")
             send_contact_email(name=request.form['name'], email=request.form['email'], message=request.form['message'])
-    return render_template("index.html", year=date.today().year, logged_in=current_user.is_authenticated, form=form, user=current_user)
+    return render_template("index.html", year=date.today().year, logged_in=current_user.is_authenticated, form=form,
+                           user=current_user)
 
 
 @app.route('/blog')
 def blog():
     posts = BlogPost.query.all()
     return render_template("blog.html", logged_in=current_user.is_authenticated, all_posts=posts,
-                           doy=datetime.now().timetuple().tm_yday, year=date.today().year, user=current_user, page="Blog")
+                           doy=datetime.now().timetuple().tm_yday, year=date.today().year, user=current_user,
+                           page="Blog")
+
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -203,7 +207,9 @@ def contact():
         if form.validate_on_submit():
             flash("Email Sent")
             send_contact_email(name=request.form['name'], email=request.form['email'], message=request.form['message'])
-    return render_template("contact_me.html", year=date.today().year, logged_in=current_user.is_authenticated, form=form, user=current_user, page="Contact")
+    return render_template("contact_me.html", year=date.today().year, logged_in=current_user.is_authenticated,
+                           form=form, user=current_user, page="Contact")
+
 
 @app.route('/projects')
 def projects():
@@ -308,7 +314,6 @@ def settings():
     return render_template('settings.html', logged_in=current_user.is_authenticated, year=date.today().year,
                            user=current_user, picture_form=picture_form, password_form=password_form,
                            delete_form=delete_form, page="Settings")
-
 
 
 @app.route("/new-post", methods=['GET', 'POST'])
@@ -441,7 +446,6 @@ def edit_project(proj_id):
                            year=date.today().year, user=current_user, page="Edit Project")
 
 
-
 @app.route("/project/<int:proj_id>", methods=['GET', 'POST'])
 def show_project(proj_id):
     form = CommentForm()
@@ -509,7 +513,7 @@ def delete_post_comment(post_id, comment_id):
 def send_contact_email(name, email, message):
     message = Mail(
         from_email='michael@freno.me',
-        to_emails= 'michaelt.freno@gmail.com',
+        to_emails='michaelt.freno@gmail.com',
         subject='Website Contact Request',
         html_content=f'name: {name}<br>email: {email}<br>message: {message}')
     try:
@@ -521,10 +525,11 @@ def send_contact_email(name, email, message):
     except Exception as e:
         print(e.message)
 
+
 def send_registration_email(name, email):
     message = Mail(
         from_email='michael@freno.me',
-        to_emails={email},
+        to_emails=email,
         subject='Thank you!',
         html_content=f'<h3>Hello {name}, and thanks for registering for my website!</h3><br> No other emails will be '
                      f'sent to you, '
@@ -538,7 +543,6 @@ def send_registration_email(name, email):
         print(response.headers)
     except Exception as e:
         print(e.message)
-
 
 
 if __name__ == "__main__":
