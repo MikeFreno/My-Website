@@ -17,6 +17,8 @@ import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -24,7 +26,7 @@ PP_UPLOAD_FOLDER = 'static/uploads/profile_pictures'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SECRET_KEY'] = "#@4DFsdf;[34AsD1SKb"
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['MAX_CONTENT_LENGTH'] = 32 * 1000 * 1000
 app.config['PP_FOLDER'] = PP_UPLOAD_FOLDER
 
@@ -503,21 +505,19 @@ def delete_post_comment(post_id, comment_id):
 
 
 def send_contact_email(name, email, message):
-    email_body = f"Name: {name}\nEmail: {email}\nMessage: {message}"
-    HOST = "michaelt.freno@proton.me"
-    RECEIVER = 'michaelt.freno@gmail.com'
-    msg = MIMEMultipart()
-    msg['To'] = RECEIVER
-    msg['From'] = HOST
-    msg['Subject'] = "WEBSITE CONTACT"
-    msg_ready = MIMEText(_text=email_body, _charset='utf-8')
-    msg.attach(msg_ready)
-
-    with smtplib.SMTP('127.0.0.1', 1025) as mail:
-        mail.login(HOST, "broken")
-        mail.sendmail(HOST, RECEIVER, msg.as_string())
-
-    return redirect(url_for('home', _anchor="contact"))
+    message = Mail(
+        from_email='michael@freno.me',
+        to_emails= 'michaelt.freno@gmail.com',
+        subject='Website Contact Request',
+        html_content=f'name: {name}<br>email: {email}<br>message: {message}')
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
 
 
 if __name__ == "__main__":
