@@ -13,10 +13,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from flask_gravatar import Gravatar
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-import os
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import smtplib
+import os, random, string
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
@@ -307,7 +304,9 @@ def settings():
             flash("Incorrect Current Password")
     if delete_form.validate_on_submit():
         if check_password_hash(current_user.password, delete_form.password.data):
-            db.session.delete(current_user)
+            current_user.email = "[Deleted]"
+            current_user.name = "[Deleted]"
+            current_user.password = generate_password_hash(''.join(random.choice(string) for x in range(15)),                                                          method='pbkdf2:sha256')
             db.session.commit()
             flash('Account Deleted')
             return redirect(url_for('home'))
