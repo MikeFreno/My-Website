@@ -215,7 +215,7 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data == form.password_confirm.data:
-            nameFix = form.name.data.replace(' ', '_')
+            nameFix = request.form['name'].replace(' ', '_')
             try:
                 new_user = User(
                     email=form.email.data,
@@ -227,14 +227,13 @@ def register():
                 db.session.commit()
                 user_check = User.query.filter_by(email=form.email.data).first()
                 login_user(user_check)
-                return redirect(url_for("select"))
+                return redirect(url_for("settings"))
             except IntegrityError:
                 flash('Email already registered!')
                 return redirect(url_for('register'))
         else:
             flash('Passwords do not match!')
             return redirect(url_for('register'))
-
     return render_template("register.html", form=form, logged_in=current_user.is_authenticated, year=date.today().year,
                            user=current_user)
 
@@ -248,7 +247,7 @@ def login():
         if user_check:
             if check_password_hash(user_check.password, form.password.data):
                 login_user(user_check)
-                return redirect(url_for("select"))
+                return redirect(url_for('settings'))
             else:
                 flash('Email or password is invalid.')
                 return redirect(url_for('login'))
@@ -263,7 +262,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('select', logged_in=current_user.is_authenticated))
+    return redirect(url_for('home'))
 
 
 @app.route('/settings', methods=['GET', 'POST'])
@@ -302,16 +301,11 @@ def settings():
             db.session.delete(current_user)
             db.session.commit()
             flash('Account Deleted')
-            return redirect(url_for('select'))
+            return redirect(url_for('home'))
     return render_template('settings.html', logged_in=current_user.is_authenticated, year=date.today().year,
                            user=current_user, picture_form=picture_form, password_form=password_form,
                            delete_form=delete_form)
 
-
-@app.route('/select')
-def select():
-    return render_template("select.html", logged_in=current_user.is_authenticated, year=date.today().year,
-                           user=current_user)
 
 
 @app.route("/new-post", methods=['GET', 'POST'])

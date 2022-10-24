@@ -95,6 +95,7 @@ header.masthead .post-heading .meta a {
   background-repeat: no-repeat;
   background-position: center center;
   height: 100vh;
+  width: 50vw;
 }
 .bg-image-right{
   background-image: url('../images/bot.png');
@@ -102,11 +103,12 @@ header.masthead .post-heading .meta a {
   background-repeat: no-repeat;
   background-position: center center;
   height: 100vh;
+  width: 50vw;
 }
 .bg-image-left .text {
   position: absolute;
   top: 40%;
-  left: 20%;
+  left: 2em;
   font-size: 2em;
 }
 .bg-image-left .text a {
@@ -115,7 +117,7 @@ header.masthead .post-heading .meta a {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
-  width: 15em;
+  width: 15vw;
   padding: 0.7em;
   font-size: 0.5em;
   -moz-transition: all 0.2s ease-out;
@@ -143,7 +145,7 @@ header.masthead .post-heading .meta a {
 .bg-image-right .text {
   position: absolute;
   top: 40%;
-  right: 20%;
+  right: 2em;
   font-size: 2em;
 }
 .bg-image-right .text a {

@@ -75,12 +75,13 @@
 <div class="d-flex justify-content-center">
   <form action="" method="post" class="needs-validation" novalidate>
     {{ form.hidden_tag() }}
-    <div class="col-16">
-      <div class="form-group">
-          {{ form.name.label }}
-          {{ form.name(class_="form-control", style_="color:white") }}
+    <div class="col-auto">
+        {{ form.name.label }}
+        <div class="input-group">
+          <div class="input-group-text">@</div>
+          <input type="text" class="form-control" name="name" id="autoSizingInputGroup" placeholder="Username" style="color:white;background-color:rgba(27, 31, 34, 0.85)">
+        </div>
         <div id="nameHelp" class="form-text">Used for comments, a pseudonym is acceptable.</div>
-      </div>
     </div>
     <div class="col-16">
       <div class="form-group">
