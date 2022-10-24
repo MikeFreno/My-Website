@@ -55,7 +55,7 @@
 </nav>
 
 <div class="container text-left">
-  <form id='new-post' action="" method="post" novalidate>
+  <form id='new-post' action="" method="post" enctype="multipart/form-data" novalidate>
     {{ ckeditor.load() }}
       {{ ckeditor.config(name='body') }}
     <div class="row justify-content-md-left">
