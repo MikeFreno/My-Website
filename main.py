@@ -412,7 +412,7 @@ def add_new_project():
         new = Project.query.filter(Project.title == new_proj.title, Project.subtitle == new_proj.subtitle).first()
         return redirect(url_for('show_project', proj_id=new.id))
     return render_template('new_project.html', form=form, logged_in=current_user.is_authenticated,
-                           year=date.today().year, user=current_user, page="New Projects")
+                           year=date.today().year, user=current_user, page="New Project")
 
 
 @app.route("/edit_project/<int:proj_id>", methods=['GET', 'POST'])
