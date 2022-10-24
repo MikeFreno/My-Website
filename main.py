@@ -518,6 +518,7 @@ def send_contact_email(name, email, message):
         print(response.headers)
     except Exception as e:
         print(e.message)
+        print("end")
 
 
 if __name__ == "__main__":
