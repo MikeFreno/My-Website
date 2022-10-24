@@ -440,6 +440,7 @@ def edit_project(proj_id):
                            year=date.today().year, user=current_user, page="Edit Project")
 
 
+
 @app.route("/project/<int:proj_id>", methods=['GET', 'POST'])
 def show_project(proj_id):
     form = CommentForm()
