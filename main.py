@@ -295,7 +295,7 @@ def settings():
                 current_user.password = generate_password_hash(password_form.confirm_new_password.data,
                                                                method='pbkdf2:sha256')
                 db.session.commit()
-                flash('Password Changed.')
+                flash('Password Change Successful.')
                 return redirect(url_for('settings', _anchor='form2'))
             else:
                 flash("New Password Fields Must Match")
