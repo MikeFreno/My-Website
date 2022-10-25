@@ -63,9 +63,15 @@
       <button class="nav-link active" id="blog-projects-tab" data-bs-toggle="tab" data-bs-target="#blog-project-tab-pane" type="button" role="tab" aria-controls="blog-project-tab-pane" aria-selected="true">Blog/Project Posts</button>
     </li>
     {% endif %}
+    {% if shown_user.id != 1 %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="comments-tab" data-bs-toggle="tab" data-bs-target="#comments-tab-pane" type="button" role="tab" aria-controls="blog-project-tab-pane" aria-selected="false">Comment History</button>
+    </li>
+    {% else %}
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="comments-tab" data-bs-toggle="tab" data-bs-target="#comments-tab-pane" type="button" role="tab" aria-controls="blog-project-tab-pane" aria-selected="false">Comment History</button>
     </li>
+    {% endif %}
   </ul>
   <div class="tab-content" id="myTabContent">
     {% if shown_user.id == 1 %}
@@ -100,19 +106,28 @@
     </div>
   </div>
   {% endif %}
+  {% if shown_user.id !=1 %}
+  <div class="tab-pane fade show active" id="comments-tab-pane" role="tabpanel" aria-labelledby="comments-tab" tabindex="1" >
+  {% else: %}
   <div class="tab-pane fade" id="comments-tab-pane" role="tabpanel" aria-labelledby="comments-tab" tabindex="1" >
+  {% endif %}
+
     <ul class="commentList">
       {% for comment in shown_user.comments %}
-          <li style="margin-left:8em;margin-right:8em;"><hr>
-            <div>
-              <p>{{ comment.body|safe}}</p></div>
-            {% if comment.post_id == None: %}
-              <a href="{{url_for('show_project', proj_id=comment.project_id)}}" class="btn btn-dark">Parent Project</a>
-            {% else: %}
-              <a href="{{url_for('show_post', post_id = comment.post_id)}}" class="btn btn-dark">Parent Post</a>
-            {% endif %}
-          </li>
+        <li style="margin-left:8em;margin-right:8em;"><hr>
+          <div>
+            <p>{{ comment.body|safe}}</p></div>
+          {% if comment.post_id == None: %}
+            <a href="{{url_for('show_project', proj_id=comment.project_id)}}" class="btn btn-dark">Parent Project</a>
+          {% else: %}
+            <a href="{{url_for('show_post', post_id = comment.post_id)}}" class="btn btn-dark">Parent Post</a>
+          {% endif %}
+        </li>
+        {% if comment == None %}
+            <h3>It's quiet....Too Quiet</h3>
+        {% endif %}
       {% endfor %}
+
     </ul>
   </div>
 </div>

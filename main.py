@@ -314,7 +314,7 @@ def settings():
 def user_page(user_id):
     shown_user = User.query.get(user_id)
     return render_template('user_page.html', shown_user=shown_user, logged_in=current_user.is_authenticated, year=date.today().year,
-                           user=current_user, page="User Page")
+                           user=current_user, page="User Page", comment=None)
 
 @app.route("/new-post", methods=['GET', 'POST'])
 @admin_only
