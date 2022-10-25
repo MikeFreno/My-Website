@@ -123,10 +123,10 @@
             <a href="{{url_for('show_post', post_id = comment.post_id)}}" class="btn btn-dark">Parent Post</a>
           {% endif %}
         </li>
-        {% if comment == None %}
-            <h3>It's quiet....Too Quiet</h3>
-        {% endif %}
       {% endfor %}
+      {% if comment_list_length < 1 %}
+            <h3>It's quiet....Too Quiet</h3>
+      {% endif %}
 
     </ul>
   </div>

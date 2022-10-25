@@ -313,8 +313,9 @@ def settings():
 @app.route("/user_page/<int:user_id>")
 def user_page(user_id):
     shown_user = User.query.get(user_id)
+    comments = shown_user.comments
     return render_template('user_page.html', shown_user=shown_user, logged_in=current_user.is_authenticated, year=date.today().year,
-                           user=current_user, page="User Page", comment=None)
+                           user=current_user, page="User Page", comment_list_length=comments.count())
 
 @app.route("/new-post", methods=['GET', 'POST'])
 @admin_only
