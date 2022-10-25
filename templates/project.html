@@ -141,8 +141,10 @@
               <p>{{ comment.body|safe}}</p></div>
             {% if comment.author == None %}
               <div>[User Account Deleted]</div>
-              {% if comment.author.id == user.id or user.id == 1: %}
-                <a href="{{url_for('delete_project_comment', proj_id=proj.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="position: relative;color:gray;margin-left:0.5em;"></a>
+              {% if logged_in: %}
+                {% if comment.author.id == user.id or user.id == 1: %}
+                  <a href="{{url_for('delete_project_comment', proj_id=proj.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="position: relative;color:gray;margin-left:0.5em;"></a>
+                {% endif %}
               {% endif %}
             {% else %}
               <div class="accountImage me-auto">

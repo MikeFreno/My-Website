@@ -155,7 +155,6 @@ class DeleteProfileForm(FlaskForm):
 with app.app_context():
     db.create_all()
 
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -304,11 +303,8 @@ def settings():
             flash("Incorrect Current Password")
     if delete_form.validate_on_submit():
         if check_password_hash(current_user.password, delete_form.password.data):
-            current_user.email = "[Deleted]"
-            current_user.name = "[Deleted]"
-            current_user.password = generate_password_hash(''.join(random.choice(string) for x in range(15)),                                                          method='pbkdf2:sha256')
+            db.session.delete(current_user)
             db.session.commit()
-            flash('Account Deleted')
             return redirect(url_for('home'))
     return render_template('settings.html', logged_in=current_user.is_authenticated, year=date.today().year,
                            user=current_user, picture_form=picture_form, password_form=password_form,
