@@ -140,7 +140,8 @@
             {% if comment.author == None %}
               <div>[User Account Deleted]</div>
                 {% if user.id == 1: %}
-                  <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="position: relative;color:gray;margin-left:0.5em;"></a>
+                  <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="color:gray;margin-left:0.5em;"></a>
+                  <br><a href="#" class="icon solid fa-reply" style="color:gray;margin-left:0.5em;"></a>
                 {% endif %}
             {% else %}
               <div class="accountImage me-auto">
@@ -150,11 +151,12 @@
                   <img src="../{{ comment.author.profile_picture }}" class="accountImageCropped"/><br>
                 {% endif %}
                 {% if comment.author.email == user.email or user.id == 1: %}
-                  <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="position: relative;color:gray;margin-left:0.5em;"></a>
+                  <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="color:gray;margin-left:0.5em;"></a>
                 {% endif %}
               </div>
             <div>
               <a href="{{ url_for('user_page', user_id=comment.author.id) }}"><span class="date sub-text">- @{{ comment.author.name }}</span></a>
+              <br><a href="#" class="icon solid fa-reply" style="color:gray;margin-left:0.5em;"></a>
             </div>
             {% endif %}
           </li>
