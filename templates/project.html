@@ -44,6 +44,7 @@
             <li><h6 class="dropdown-header">@{{ user.name }}</h6></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{url_for('settings')}}">Account Settings</a></li>
+            <li><a class="dropdown-item" href="{{url_for('user_page', user_id=current_user.id)}}">My Page</a></li>
             <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
             {% endif %}
           </ul>
