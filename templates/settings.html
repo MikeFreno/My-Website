@@ -73,7 +73,7 @@
     {% endwith %}
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0" >
-      Current Profile Picture<br>
+      <br>Current Profile Picture<br>
       {% if user.profile_picture==None %}
         <img src="{{ user.email | gravatar }}"/><br>
       {% else %}
@@ -92,7 +92,7 @@
     <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
       <div style="text-align:center">
       </div>
-      Change Password:
+      <br>Change Password:
       <div class="d-flex justify-content-center" id="page_form2">
         <form id='form2' action="" method="post" novalidate>
               {{ password_form.hidden_tag() }}
@@ -129,7 +129,7 @@
               {{ delete_form.hidden_tag() }}
           <div class="col-16">
             <div class="form-group">
-                {{ delete_form.password.label }}
+                <br>{{ delete_form.password.label }}
                 {{ delete_form.password(class_="form-control", style_="color:white") }}
             </div><br>
             <div class="col-3">

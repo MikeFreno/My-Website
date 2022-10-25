@@ -28,7 +28,7 @@
                 {% if user.profile_picture==None %}
                   <img src="{{ user.email | gravatar }}"/><br>
                 {% else %}
-                  <img src="{{ user.profile_picture }}" class="accountImageCropped"/><br>
+                  <img src="../{{ user.profile_picture }}" class="accountImageCropped"/><br>
               {% endif %}
               </div>{% endif %}
             {% if not logged_in: %}Account{% endif %}
@@ -76,7 +76,7 @@
   <div class="tab-content" id="myTabContent">
     {% if shown_user.id == 1 %}
     <div class="tab-pane fade show active" id="blog-project-tab-pane" role="tabpanel" aria-labelledby="blog-project-tab" tabindex="0" >
-      <h3>Blog Posts</h3>
+      <br><h3>Blog Posts</h3>
       {% for post in shown_user.posts %}
         <div class="d-flex justify-content-center">
           <div class="card text-center" style="width: 24rem;">
@@ -125,9 +125,8 @@
         </li>
       {% endfor %}
       {% if comment_list_length < 1 %}
-            <h3>It's quiet....Too Quiet</h3>
+            <br><h3>It's quiet....Too Quiet</h3>
       {% endif %}
-
     </ul>
   </div>
 </div>
