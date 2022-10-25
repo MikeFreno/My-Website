@@ -310,6 +310,11 @@ def settings():
                            user=current_user, picture_form=picture_form, password_form=password_form,
                            delete_form=delete_form, page="Settings")
 
+@app.route("/user_page/<int:user_id>")
+def user_page(user_id):
+    shown_user = User.query.get(user_id)
+    return render_template('user_page.html', shown_user=shown_user, logged_in=current_user.is_authenticated, year=date.today().year,
+                           user=current_user, page="User Page")
 
 @app.route("/new-post", methods=['GET', 'POST'])
 @admin_only
