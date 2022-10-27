@@ -142,6 +142,7 @@
                 {% if user.id == 1: %}
                   <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="color:gray;margin-left:0.5em;"></a>
                   <br><a href="#" class="icon solid fa-reply" style="color:gray;margin-left:0.5em;"></a>
+                  <div class="like_button_container" data-commentid="{{comment.id}}"></div>
                 {% endif %}
             {% else %}
               <div class="accountImage me-auto">
@@ -156,14 +157,33 @@
               </div>
             <div>
               <a href="{{ url_for('user_page', user_id=comment.author.id) }}"><span class="date sub-text">- @{{ comment.author.name }}</span></a>
-              <br><a href="#" class="icon solid fa-reply" style="color:gray;margin-left:0.5em;"></a>
+              <br>
+              <button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="setReplyVisibility{{ comment.id }}()"></button>
+              <div class="like_button_container" data-commentid="{{comment.id}}"></div>
             </div>
+            <br>
+            {% if logged_in %}
+              <div class="d-flex justify-content-center">
+                <form class='commentReplyForm' data-commentid="{{comment.id}}" style="display:none;" action="" method="post" novalidate>
+                  {{ form.hidden_tag() }}
+                  <div class="col-16">
+                    <div class="form-group">
+                        {{ replyform.body.label }}
+                        {{ replyform.body(class_="form-control", style_="color:white") }}
+                    </div><br>
+                  </div>
+                  <div class="col-3">
+                        {{ replyform.submit(class_="btn btn-dark") }}
+                  </div>
+                </form>
+               </div>
+              {% endif %}
             {% endif %}
           </li>
         </ul>
       {% endfor %}
       <span id="past_last"></span>
-      </div>
+    </div>
  </article>
 
 

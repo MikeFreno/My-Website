@@ -12,10 +12,12 @@ from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_gravatar import Gravatar
 from functools import wraps
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-import os, random, string
+from sqlalchemy.exc import IntegrityError
+import os
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import *
+from image_var import image
+import json
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -74,9 +76,12 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text, nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    author = relationship("User", back_populates="comments")
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("projects.id"))
+    parent_comment = db.Column(db.Integer, nullable=True)
+    is_child = db.Column(db.Boolean, nullable=False)
+    likes = db.Column(db.Integer, nullable=False)
+    author = relationship("User", back_populates="comments")
     parent_post = relationship("BlogPost", back_populates="comments")
     parent_project = relationship("Project", back_populates="comments")
 
@@ -129,6 +134,10 @@ class NewProjectForm(FlaskForm):
     cover_photo = StringField("Project Cover Photo URL")
     body = CKEditorField("Project Text Content", validators=[DataRequired()])
     submit = SubmitField("Submit Post")
+
+class CommentReplyForm(FlaskForm):
+    body = CKEditorField("Comment", validators=[DataRequired()])
+    submit = SubmitField("Post Reply")
 
 
 class CommentForm(FlaskForm):
@@ -375,13 +384,21 @@ def edit_post(post_id):
 @app.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def show_post(post_id):
     form = CommentForm()
+    replyform = CommentReplyForm()
     requested_post = BlogPost.query.get(post_id)
+    comment_list = requested_post.comments
+    comment_ids = []
+    for comment in comment_list:
+        comment_ids.append(str(comment.id))
+    comment_list_length = len(comment_ids)
     if form.validate_on_submit():
         if current_user.is_authenticated:
             new_comment = Comment(
                 body=form.body.data,
                 author=current_user,
-                parent_post=requested_post
+                parent_post=requested_post,
+                is_child=False,
+                likes=0,
             )
             db.session.add(new_comment)
             db.session.commit()
@@ -389,8 +406,7 @@ def show_post(post_id):
         else:
             flash('Must be logged in to comment')
             return redirect(url_for('login'))
-    return render_template("post.html", post=requested_post, user=current_user, logged_in=current_user.is_authenticated,
-                           form=form, page="Blog")
+    return render_template("post.html", post=requested_post, user=current_user, logged_in=current_user.is_authenticated, form=form, page="Blog", replyform=replyform, comment_ids=comment_ids, length=comment_list_length, year=date.today().year)
 
 
 @app.route("/new-project", methods=['GET', 'POST'])
@@ -456,7 +472,9 @@ def show_project(proj_id):
             new_comment = Comment(
                 body=form.body.data,
                 author=current_user,
-                parent_project=requested_proj
+                parent_project=requested_proj,
+                is_child=False,
+                likes=0
             )
             db.session.add(new_comment)
             db.session.commit()
@@ -466,7 +484,7 @@ def show_project(proj_id):
             return redirect(url_for('login'))
 
     return render_template("project.html", proj=requested_proj, user=current_user,
-                           logged_in=current_user.is_authenticated, form=form, page="Projects")
+                           logged_in=current_user.is_authenticated, year=date.today().year, form=form, page="Projects")
 
 
 @app.route("/_deletepo/<int:post_id>", methods=['GET', 'POST', 'DELETE'])
@@ -524,7 +542,7 @@ def send_contact_email(name, email, message):
         print(response.body)
         print(response.headers)
     except Exception as e:
-        print(e.message)
+        print(e)
 
 
 def send_registration_email(name, email):
@@ -532,8 +550,8 @@ def send_registration_email(name, email):
         from_email='michael@freno.me',
         to_emails=email,
         subject='Thank you!',
-        html_content=f'<h4 style="text-align: center;"><img src="{{url_for("static", filename="images/favicon.ico")}} '
-                     f'alt="logo">Mike Freno</h4><br><h2>Hello {name},<br> Thanks for registering for my website!</h2><br> '
+        html_content=f'<h4 style="text-align: center;"><img src="data:image/jpeg;base64,{image}"'
+                     f'alt="logo" style="height:50px;width:50px">Mike Freno</h4><br><h2>Hello {name},<br> Thanks for registering for my website!</h2><br> '
                      f'No other emails will be sent to you, '
                      f' outside of responses back for inquiry and any emailers that you decide to opt-in to (yet to be '
                      f'implemented as of writing), of which you can of course opt out of at anytime. <br><br> Thanks '
@@ -541,9 +559,6 @@ def send_registration_email(name, email):
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
     except Exception as e:
         print(e.message)
 
