@@ -1,7 +1,6 @@
 'use strict';
 
 const e = React.createElement;
-const f = React.createElement;
 
 class LikeButton extends React.Component {
   constructor(props) {
@@ -11,7 +10,7 @@ class LikeButton extends React.Component {
 
   render() {
     if (this.state.liked) {
-      return 'You liked this.';
+      return "You liked this... but it doesn't do anything yet.";
     }
 
     return e(
@@ -32,20 +31,20 @@ document.querySelectorAll('.like_button_container')
   });
 
 
-cons r = React.createElement;
-class commentReplyForm extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { display: none};
-        }
-    }
-
-document.querySelectorAll('.commentReplyForm')
-  .forEach(domContainer => {
-    // Read the comment ID from a data-* attribute.
-    const commentID = parseInt(domContainer.dataset.commentid);
-    const root = ReactDOM.createRoot(domContainer);
-    root.render(
-      r(commentReplyForm, { commentID: commentID })
-    );
-  });
+//cons r = React.createElement;
+//class commentReplyForm extends React.Component {
+//    constructor(props) {
+//        super(props);
+//        this.state = { display: none};
+//        }
+//    }
+//
+//document.querySelectorAll('.commentReplyForm')
+//  .forEach(domContainer => {
+//    // Read the comment ID from a data-* attribute.
+//    const commentID = parseInt(domContainer.dataset.commentid);
+//    const root = ReactDOM.createRoot(domContainer);
+//    root.render(
+//      r(commentReplyForm, { commentID: commentID })
+//    );
+//  });
