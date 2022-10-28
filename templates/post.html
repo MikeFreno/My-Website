@@ -158,6 +158,7 @@
             <div>
               <a href="{{ url_for('user_page', user_id=comment.author.id) }}"><span class="date sub-text">- @{{ comment.author.name }}</span></a>
               <br>
+              <div class="commentReply" data-commentReplyButton="{{comment.id}}"></div>
               <button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="setReplyVisibility{{ comment.id }}()"></button>
               <div class="like_button_container" data-commentid="{{comment.id}}"></div>
             </div>
@@ -187,4 +188,4 @@
  </article>
 
 
-{% include "footer.html" %}
+{% include "footer_2.html" %}

@@ -387,10 +387,10 @@ def show_post(post_id):
     replyform = CommentReplyForm()
     requested_post = BlogPost.query.get(post_id)
     comment_list = requested_post.comments
-    comment_ids = []
+    comment_data = {}
     for comment in comment_list:
-        comment_ids.append(str(comment.id))
-    comment_list_length = len(comment_ids)
+        comment_data[comment.id] = comment.likes
+    jsoned = json.dumps(comment_data)
     if form.validate_on_submit():
         if current_user.is_authenticated:
             new_comment = Comment(
@@ -406,7 +406,10 @@ def show_post(post_id):
         else:
             flash('Must be logged in to comment')
             return redirect(url_for('login'))
-    return render_template("post.html", post=requested_post, user=current_user, logged_in=current_user.is_authenticated, form=form, page="Blog", replyform=replyform, comment_ids=comment_ids, length=comment_list_length, year=date.today().year)
+    return render_template("post.html", post=requested_post, user=current_user,
+                           logged_in=current_user.is_authenticated, form=form, page="Blog",
+                           replyform=replyform, comment_data=jsoned,
+                           year=date.today().year)
 
 
 @app.route("/new-project", methods=['GET', 'POST'])
@@ -565,3 +568,4 @@ def send_registration_email(name, email):
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+0
