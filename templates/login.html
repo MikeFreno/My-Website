@@ -69,7 +69,7 @@
 
 <div class="d-flex justify-content-center">
   <form action="" method="post" novalidate>
-    {{ form.hidden_tag() }}
+    {{ form.csrf_token() }}
     <div class="col-16">
       <div class="form-group">
           {{ form.email.label }}
