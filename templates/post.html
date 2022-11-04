@@ -1,4 +1,7 @@
+{% import "bootstrap/wtf.html" as wtf %}
+
 {% include "header.html" %}
+<!--Nav Bar-->
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="{{url_for('home')}}" style="border-bottom: none;">
@@ -51,6 +54,7 @@
     </div>
   </div>
 </nav>
+<!--Post Contents-->
 {% if post.cover_photo.split('/')[0]=='static' %}
 <header class="masthead" style="background-image: url('../{{ post.cover_photo }}')">
 {% else %}
@@ -71,7 +75,6 @@
     </div>
   </div>
 </header>
-<!-- Post Content -->
 <div class="container text-center">
   <div class="row justify-content-md-left">
     <div class="col col-lg-2">
@@ -101,23 +104,27 @@
     </div>
   </div>
 </div><br>
+<!--   Parent Comment Form-->
    {% if logged_in: %}
-     {{ ckeditor.load() }}
-     {{ ckeditor.config(name='body') }}
-     <div class="d-flex justify-content-center">
-      <form id='comment' action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <div class="col-16">
-          <div class="form-group">
-              {{ form.body.label }}
-              {{ form.body(class_="form-control", style_="color:white") }}
-          </div><br>
-        </div>
-        <div class="col-3">
+   <div class="container text-left">
+     <div class="col-lg-8 col-md-10 mx-auto">
+       <div class="col-lg-8">
+         <form action="" method="post" class="needs-validation" novalidate>
+           {{ form.csrf_token() }}
+            {{ form.body.label }}
+            <div class="col">
+              <textarea class="form-control" name="comment" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)" required></textarea>
+              <div class="invalid-feedback">Please include a message.</div>
+            </div>
+            <div class="col-3">
+              <br>
               {{ form.submit(class_="btn btn-dark") }}
-        </div>
-      </form>
+            </div>
+        </form>
+       </div>
      </div>
+   </div>
+<!--Login Check-->
    {% else %}
    <div class="text-center">
      <div class="row">
@@ -130,62 +137,10 @@
      </div>
    </div>
    {% endif %}
-    <div class="col-md-10 mx-auto">
-      {% for comment in post.comments: %}
-        <ul class="commentList">
-          <li style="margin-left:8em;margin-right:8em;"><hr>
-            <div>
-              <p>{{ comment.body|safe}}
-              </p></div>
-            {% if comment.author == None %}
-              <div>[User Account Deleted]</div>
-                {% if user.id == 1: %}
-                  <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="color:gray;margin-left:0.5em;"></a>
-                  <br><a href="#" class="icon solid fa-reply" style="color:gray;margin-left:0.5em;"></a>
-                  <div class="like_button_container" data-commentid="{{comment.id}}"></div>
-                {% endif %}
-            {% else %}
-              <div class="accountImage me-auto">
-                {% if comment.author.profile_picture==None: %}
-                  <img src="{{ comment.author.email | gravatar }}"/><br>
-                {% else %}
-                  <img src="../{{ comment.author.profile_picture }}" class="accountImageCropped"/><br>
-                {% endif %}
-                {% if comment.author.email == user.email or user.id == 1: %}
-                  <a href="{{url_for('delete_post_comment', post_id=post.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="color:gray;margin-left:0.5em;"></a>
-                {% endif %}
-              </div>
-            <div>
-              <a href="{{ url_for('user_page', user_id=comment.author.id) }}"><span class="date sub-text">- @{{ comment.author.name }}</span></a>
-              <br>
-              <div class="commentReply" data-commentReplyButton="{{comment.id}}"></div>
-              <button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="setReplyVisibility{{ comment.id }}()"></button>
-              <div class="like_button_container" data-commentid="{{comment.id}}"></div>
-            </div>
-            <br>
-            {% if logged_in %}
-              <div class="d-flex justify-content-center">
-                <form class='commentReplyForm' data-commentid="{{comment.id}}" style="display:none;" action="" method="post" novalidate>
-                  {{ form.hidden_tag() }}
-                  <div class="col-16">
-                    <div class="form-group">
-                        {{ replyform.body.label }}
-                        {{ replyform.body(class_="form-control", style_="color:white") }}
-                    </div><br>
-                  </div>
-                  <div class="col-3">
-                        {{ replyform.submit(class_="btn btn-dark") }}
-                  </div>
-                </form>
-               </div>
-              {% endif %}
-            {% endif %}
-          </li>
-        </ul>
-      {% endfor %}
-      <span id="past_last"></span>
-    </div>
+   <br>
+<!--   Comment Section-->
+        {{ comments }}
+   <span id="past_last"></span>
  </article>
-
 
 {% include "footer_2.html" %}

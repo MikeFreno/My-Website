@@ -1,6 +1,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% include "header.html" %}
+<!--Nav Bar-->
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="{{url_for('home')}}" style="border-bottom: none;">
@@ -53,11 +54,11 @@
     </div>
   </div>
 </nav>
-
+<!--Post Contents-->
 {% if proj.cover_photo.split('/')[0]=='static' %}
-  <header class="masthead" style="background-image: url('../{{ proj.cover_photo }}')">
+<header class="masthead" style="background-image: url('../{{ proj.cover_photo }}')">
 {% else %}
-  <header class="masthead" style="background-image: url('{{ proj.cover_photo }}')">
+<header class="masthead" style="background-image: url('{{ proj.cover_photo }}')">
 {% endif %}
   <div class="overlay"></div>
   <div class="container">
@@ -67,14 +68,13 @@
           <h1>{{proj.title}}</h1>
           <h2 class="subheading">{{proj.subtitle}}</h2>
           <span class="meta">Posted by
-            <a href="#">{{proj.author.name}}</a>
+            <a href="#" style="border-bottom: none;">{{proj.author.name.replace('_', ' ')}}</a>
             on {{proj.date}}</span>
         </div>
       </div>
     </div>
   </div>
 </header>
-<!-- Post Content -->
 <div class="container text-center">
   <div class="row justify-content-md-left">
     <div class="col col-lg-2">
@@ -90,8 +90,8 @@
         <hr>
         {% if current_user.id == 1 %}
          <div class="clearfix">
-        <a class="btn btn-dark float-right" href="{{url_for('edit_project', proj_id=proj.id)}}">Edit Project</a>
-        <a class="btn btn-dark float-right" href="{{url_for('delete_project', proj_id=proj.id)}}">Delete Project</a>
+        <a class="btn btn-dark float-right" href="{{url_for('edit_project', proj_id=proj.id)}}">Edit Post</a>
+        <a class="btn btn-dark float-right" href="{{url_for('delete_project', proj_id=proj.id)}}">Delete Post</a>
         </div>
         {% endif %}
       </div>
@@ -103,25 +103,28 @@
       <a href="{{ url_for('projects') }}" class='back' style="border-bottom: none;">&lt Back</a>
     </div>
   </div>
-</div>
-   <br>
+</div><br>
+<!--   Parent Comment Form-->
    {% if logged_in: %}
-     {{ ckeditor.load() }}
-     {{ ckeditor.config(name='body') }}
-     <div class="d-flex justify-content-center">
-      <form id='comment' action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <div class="col-16">
-          <div class="form-group">
-              {{ form.body.label }}
-              {{ form.body(class_="form-control", style_="color:white;") }}
-          </div><br>
-        </div>
-        <div class="col-3">
+   <div class="container text-left">
+     <div class="col-lg-8 col-md-10 mx-auto">
+       <div class="col-lg-8">
+         <form action="" method="post" class="needs-validation" novalidate>
+           {{ form.csrf_token() }}
+            {{ form.body.label }}
+            <div class="col">
+              <textarea class="form-control" name="comment" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)" required></textarea>
+              <div class="invalid-feedback">Please include a message.</div>
+            </div>
+            <div class="col-3">
+              <br>
               {{ form.submit(class_="btn btn-dark") }}
-        </div>
-      </form>
+            </div>
+        </form>
+       </div>
      </div>
+   </div>
+<!--Login Check-->
    {% else %}
    <div class="text-center">
      <div class="row">
@@ -134,39 +137,10 @@
      </div>
    </div>
    {% endif %}
-    <div class="col-md-10 mx-auto">
-      {% for comment in proj.comments: %}
-        <ul class="commentList">
-          <li style="margin-left:8em;margin-right:8em;"><hr>
-            <div>
-              <p>{{ comment.body|safe}}</p></div>
-            {% if comment.author == None %}
-              <div>[User Account Deleted]</div>
-                {% if user.id == 1: %}
-                  <a href="{{url_for('delete_project_comment', proj_id=proj.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="position: relative;color:gray;margin-left:0.5em;"></a>
-                {% endif %}
-            {% else %}
-              <div class="accountImage me-auto">
-                {% if comment.author.profile_picture==None: %}
-                  <img src="{{ comment.author.email | gravatar }}"/><br>
-                {% else %}
-                  <img src="../{{ comment.author.profile_picture }}" class="accountImageCropped"/><br>
-                {% endif %}
-                {% if comment.author.email == user.email or user.id == 1: %}
-                  <a href="{{url_for('delete_project_comment', proj_id=proj.id, comment_id=comment.id) }}" class="icon fa-trash-alt" style="position: relative;color:gray;margin-left:0.5em;"></a>
-                {% endif %}
-              </div>
-              <div>
-                <a href="{{ url_for('user_page', user_id=comment.author.id) }}"><span class="date sub-text">- @{{ comment.author.name }}</span></a>
-              </div>
-            {% endif %}
-          </li>
-        </ul>
-      {% endfor %}
-      <span id="past_last"></span>
-      </div>
+   <br>
+<!--   Comment Section-->
+        {{ comments }}
+   <span id="past_last"></span>
  </article>
 
-
-
-{% include "footer.html" %}
+{% include "footer_2.html" %}

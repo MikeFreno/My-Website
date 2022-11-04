@@ -128,6 +128,9 @@ nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-link.active {
 .commentList {
     padding:0;
     list-style:none;
+    margin-bottom:-2em;
+    margin-top:-2em;
+    padding-inline-start: 0px;
 }
 .back {
     color:#adb5bd;
@@ -136,4 +139,8 @@ nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-link.active {
 .back:hover{
     color : inherit;
     filter: brightness(150%);
+}
+.vl{
+  border-left: .5px solid white;
+  position: relative;
 }
