@@ -5,5 +5,4 @@ My Professional Website
 <img width="1434" alt="Screenshot 2022-10-25 at 5 22 05 PM" src="https://user-images.githubusercontent.com/108227314/197885395-f550faa7-c502-4126-9672-78b1f8e9fa5d.png">
 <img width="1433" alt="Screenshot 2022-10-25 at 5 22 37 PM" src="https://user-images.githubusercontent.com/108227314/197885404-0481009d-193a-4e24-9063-e39f8de0a449.png">
 <img width="1414" alt="Screenshot 2022-10-25 at 5 29 57 PM" src="https://user-images.githubusercontent.com/108227314/197885754-93812fed-dd97-41a4-ae58-742efa72e9c2.png">
-<img width="1438" alt="Screenshot 2022-10-25 at 5 29 30 PM" src="https://user-images.githubusercontent.com/108227314/197885756-395b93dc-04b8-4e8b-a5c3-49c5cf37e7d7.png">
 <img width="1440" alt="Screenshot 2022-10-25 at 5 31 48 PM" src="https://user-images.githubusercontent.com/108227314/197886016-9886134d-8d67-4a03-b1bf-7fa6ef11cdc1.png">
