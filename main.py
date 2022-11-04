@@ -506,7 +506,7 @@ def show_project(proj_id):
             new_reply = Comment(
                 body=request.form['comment_reply'],
                 author=current_user,
-                parent_post=requested_post,
+                parent_post=requested_project,
                 likes=0,
                 parent_comment=request.form['parent_comment'],
             )
