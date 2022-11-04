@@ -3,7 +3,7 @@ My Professional Website
 <br>Just added comment chains!
 <img width="1278" alt="Screenshot 2022-11-04 at 10 03 18 AM" src="https://user-images.githubusercontent.com/108227314/199993323-30654722-8a0b-48e4-aa03-3018bc9d8974.png">
 <img width="1278" alt="Screenshot 2022-11-04 at 10 04 04 AM" src="https://user-images.githubusercontent.com/108227314/199993312-1f2e26b8-347e-4f47-970b-d61dcfd38972.png">
-<br>Registration Email
+Registration Email
 <img width="536" alt="Screenshot 2022-11-04 at 10 13 29 AM" src="https://user-images.githubusercontent.com/108227314/199996394-f7622d58-740d-454f-a6b9-3db547fd3d88.png">
 <br>Other Screenshots
 <img width="1437" alt="Screenshot 2022-10-25 at 5 15 30 PM" src="https://user-images.githubusercontent.com/108227314/197885374-d7ddc2e1-7556-45a3-b4db-9ee571a22e34.png">
