@@ -495,7 +495,7 @@ def show_project(proj_id):
             new_comment = Comment(
                 body=request.form['comment'],
                 author=current_user,
-                parent_post=requested_project,
+                parent_project=requested_project,
                 likes=0,
                 parent_comment=None,
             )
@@ -506,13 +506,13 @@ def show_project(proj_id):
             new_reply = Comment(
                 body=request.form['comment_reply'],
                 author=current_user,
-                parent_post=requested_project,
+                parent_project=requested_project,
                 likes=0,
                 parent_comment=request.form['parent_comment'],
             )
             db.session.add(new_reply)
             db.session.commit()
-            return redirect(url_for('show_post', proj_id=proj_id, _anchor="past_last"))
+            return redirect(url_for('show_project', proj_id=proj_id, _anchor="past_last"))
     return render_template("project.html", proj=requested_project, user=current_user,
                            logged_in=current_user.is_authenticated, form=form, page="Projects",
                            replyform=replyform, year=date.today().year,
