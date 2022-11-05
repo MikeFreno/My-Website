@@ -19,16 +19,26 @@ from sendgrid.helpers.mail import *
 from image_var import image
 from markupsafe import Markup
 import json
+from libgravatar import Gravatar as G
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 PP_UPLOAD_FOLDER = 'static/uploads/profile_pictures'
+
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['MAX_CONTENT_LENGTH'] = 32 * 1000 * 1000
 app.config['PP_FOLDER'] = PP_UPLOAD_FOLDER
+
+gravatar = Gravatar(app,
+                    size=100,
+                    rating='g',
+                    default='identicon',
+                    force_default=False,
+                    use_ssl=False,
+                    base_url=None)
 
 ckeditor = CKEditor(app)
 Bootstrap(app)
@@ -37,9 +47,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:/
                                                                                                     "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-gravatar = Gravatar(app, size=100, rating='g', default='identicon', force_default=False, force_lower=False,
-                    use_ssl=False,
-                    base_url=None)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -631,7 +638,8 @@ def HTML_comment_pass(comment):
     else:
         intact_commenter_image = Markup('<div class="accountImage me-auto">')
         if comment.author.profile_picture==None:
-            intact_commenter_image+=Markup('''<img src="{{ '''+ f'''"{comment.author.email}"''' + ''' | gravatar }}"/><br></div>''')
+            gravatar = gravatar_gen(comment.author.email)
+            intact_commenter_image+=Markup(f'''<img src="{gravatar}"/><br></div>''')
         else:
             intact_commenter_image+=Markup(f'''<img src="../{ comment.author.profile_picture }" class="accountImageCropped"/><br></div>''')
         html_with_commenter_image = html_starter+intact_commenter_image
@@ -681,6 +689,9 @@ def send_registration_email(name, email):
     except Exception as e:
         print(e.message)
 
+def gravatar_gen(email):
+    g = G(email)
+    return g.get_image(size=100,default='identicon')
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 4000)))
