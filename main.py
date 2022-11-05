@@ -631,7 +631,7 @@ def HTML_comment_pass(comment):
     else:
         intact_commenter_image = Markup('<div class="accountImage me-auto">')
         if comment.author.profile_picture==None:
-            intact_commenter_image+=Markup(f'''<img src="{{ {comment.author.email} | gravatar }}"/><br></div>''')
+            intact_commenter_image+=Markup(f'''<img src="{{{ {comment.author.email} | gravatar }}}"/><br></div>''')
         else:
             intact_commenter_image+=Markup(f'''<img src="../{ comment.author.profile_picture }" class="accountImageCropped"/><br></div>''')
         html_with_commenter_image = html_starter+intact_commenter_image
