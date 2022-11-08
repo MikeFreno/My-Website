@@ -1,0 +1,107 @@
+{% include "header.html" %}
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{url_for('home')}}" style="border-bottom: none;">
+      <img src="{{ url_for('static', filename='images/favicon.ico')}}" alt="Logo" width="24" height="24" class="d-inline-block align-text-top">
+      Mike Freno</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav mt-auto">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{{url_for('home')}}" style="border-bottom: none;">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{{url_for('projects')}}" style="border-bottom: none;">Projects</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{{url_for('blog')}}" style="border-bottom: none;">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('contact')}}" style="border-bottom: none;">Contact</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle-end" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-bottom: none;">
+            {% if logged_in: %}
+              <div class="accountImage me-auto">
+                {% if user.profile_picture==None %}
+                  <img src="{{ user.email | gravatar }}"/><br>
+                {% else %}
+                  <img src="{{ user.profile_picture }}" class="accountImageCropped"/><br>
+              {% endif %}
+              </div>{% endif %}
+            {% if not logged_in: %}Account{% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            {% if not logged_in: %}
+            <li><a class="dropdown-item" href="{{url_for('login')}}">Login</a></li>
+            <li><a class="dropdown-item" href="{{url_for('register')}}">Register</a></li>
+            {% endif %}
+            {% if logged_in: %}
+            <li><h6 class="dropdown-header">@{{ user.name }}</h6></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{url_for('settings')}}">Account Settings</a></li>
+            <li><a class="dropdown-item" href="{{url_for('user_page', user_id=current_user.id)}}">My Page</a></li>
+            <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
+            {% endif %}
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Page Header -->
+<header class="masthead" style="background-image: url('static/images/nyc night.jpg')">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="site-heading">
+          <h1>Mike's Blog</h1>
+          <span class="subheading">A collection of thoughts.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+{% if user.id == 1 : %}
+<div class="d-flex justify-content-end" style="margin-right:20px">
+  <a class="btn btn-light" href="{{url_for('add_new_blog')}}" role="button">Create New Post</a>
+</div>
+<br>
+{% endif %}
+
+{% for post in all_posts %}
+<div class="d-flex justify-content-center">
+  <div class="card text-center" style="width: 36rem;">
+    <img src="{{post.cover_photo}}" class="card-img-top" alt="..." style="position: relative;">
+    {% if user.id == 1: %}
+      <a href="{{url_for('delete_post', post_id=post.id) }}" class="icon fa-trash-alt" style="position: absolute;color:gray;margin-left:0.5em;"></a>
+    {% endif %}
+    <div class="card-body">
+      <h5 class="card-title" style="color:black">{{post.title}}</h5>
+      <p class="card-text" style="color:black">{{post.subtitle}}</p>
+      <a href="{{url_for('show_post', post_id=post.id)}}" class="btn btn-dark">Read</a>
+    </div>
+    <div class="card-footer text-muted">
+      {% if doy-post.doy>730 %}
+        {{ ((doy-post.doy)*-1)%365 }} years ago
+      {% elif doy-post.doy>365 %}
+        1 year ago
+      {% elif doy-post.doy==0 %}
+        Today
+      {% elif doy-post.doy==1 %}
+        Yesterday
+      {% else %}
+        {{ (doy-post.doy) }} days ago
+      {% endif %}
+    </div>
+  </div>
+</div><br>
+{% endfor %}
+
+
+{% include "footer.html" %}
