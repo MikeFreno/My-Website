@@ -397,7 +397,7 @@ def show_post(post_id):
     comment_structure = order_comments(post_id)
     construct = ''
     for n in range(0, len(comment_structure)):
-        parent_node = HTML_comment_pass(comment_structure[n]['comment'])
+        parent_node = HTML_comment_constructor(comment_structure[n]['comment'])
         parent_HTML = Markup(f'''</ul><ul class="commentList"><li style="margin-left:10vw;margin-right:10vw;list-style:none;"><hr><div>{parent_node}</div></li><br>''')
         rest_of_node = reducer(comment_structure[n],'',1)
         full_node = parent_HTML+rest_of_node
@@ -492,7 +492,7 @@ def show_project(proj_id):
     comment_structure = order_comments_project(proj_id)
     construct = ''
     for n in range(0, len(comment_structure)):
-        parent_node = HTML_comment_pass(comment_structure[n]['comment'])
+        parent_node = HTML_comment_constructor(comment_structure[n]['comment'])
         parent_HTML = Markup(f'''</ul><ul class="commentList"><li style="margin-left:10vw;margin-right:10vw;list-style:none;"><hr><div>{parent_node}</div></li><br>''')
         rest_of_node = reducer(comment_structure[n],'',1)
         full_node = parent_HTML+rest_of_node
@@ -567,7 +567,13 @@ def delete_post_comment(post_id, comment_id):
             db.session.commit()
     return redirect(url_for('show_post', post_id=post_id, _anchor='past_last'))
 
-
+@app.route("/_deletepp/<int:user_id>/", methods=['GET', 'POST', 'DELETE'])
+@login_required
+def delete_profile_pic(user_id):
+    picture_to_delete = User.query.get(user_id).profile_picture
+    db.session.delete(picture_to_delete)
+    db.session.commit()
+    return render_template(url_for('settings'))
 
 def order_comments(post_id):
     comments = Comment.query.filter(Comment.post_id==post_id)
@@ -601,10 +607,10 @@ def reducer(comments, children_construct,n):
         for children in comments['children']:
             if len(children)>1:
                 this_top = children['comment']
-                this_top_HTML = HTML_comment_pass(this_top)
+                this_top_HTML = HTML_comment_constructor(this_top)
                 styled = Markup(f'''<li style="margin-left:{10+(n*4)}vw;margin-right:10vw;"><div class="vl">{this_top_HTML}</div></li><br>''')
                 children_construct +=styled
-                grandchild_fix = HTML_comment_pass(children['children'][0]['comment'])
+                grandchild_fix = HTML_comment_constructor(children['children'][0]['comment'])
                 styled = Markup(f'''<li style="margin-left:{10+((n+1)*4)}vw;margin-right:10vw;"><div class="vl">{grandchild_fix}</div></li><br>''')
                 children_construct+=styled
                 children_construct+=reducer(children['children'][0],'',n+1)
@@ -613,7 +619,7 @@ def reducer(comments, children_construct,n):
                     if children['children'][1]['comment']:
                         for x in range(1, len(children['children'])):
                             print(children['children'][x]['comment'])
-                            this_grand = HTML_comment_pass(children['children'][x]['comment'])
+                            this_grand = HTML_comment_constructor(children['children'][x]['comment'])
                             styled = Markup(f'''<li style="margin-left:{10 + ((n+1) * 4)}vw;margin-right:10vw;"><div class="vl">{this_grand}</div></li><br>''')
                             children_construct += styled
                             children_construct += reducer(children['children'][x], '', n + 2)
@@ -622,7 +628,7 @@ def reducer(comments, children_construct,n):
             else:
                 #end leaf
                 end_leaf = children['comment']
-                end_leaf_HTML = HTML_comment_pass(end_leaf)
+                end_leaf_HTML = HTML_comment_constructor(end_leaf)
                 styled = Markup(f'''<li style="margin-left:{10+(n*4)}vw;margin-right:10vw;"><div class="vl">{end_leaf_HTML}</div></li><br>''')
                 children_construct += styled
     except:
@@ -630,8 +636,11 @@ def reducer(comments, children_construct,n):
     return children_construct
 
 
-def HTML_comment_pass(comment):
-    html_starter = Markup(f'''<p>{ comment.body }</p>''')
+def HTML_comment_constructor(comment):
+    html_starter = Markup(f'''{ comment.body }''')
+    modules = Markup(f'''<div class="row col-sm-8"><div class="col-3 like-count" style="color:#F2A900" id={comment.id}>+ { comment.likes } likes</div><div class="col-3"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-3"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
+    html_starter+=modules
+
     if comment.author == None:
         deleted_commenter = Markup('<div>[User Account Deleted]</div>')
         html_with_commenter = html_starter+deleted_commenter
@@ -645,11 +654,9 @@ def HTML_comment_pass(comment):
         html_with_commenter_image = html_starter+intact_commenter_image
         commenter = Markup(f'''<a href="{ url_for('user_page', user_id=comment.author.id) }">''' + f'''<span class="date sub-text">- @{ comment.author.name }</span></a>''')
         html_with_commenter = html_with_commenter_image + commenter
-    modules = Markup(f'''<div class="row"><div class="col-3"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-3"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
-    full_comment_node = html_with_commenter+ modules
     replyform = CommentReplyForm()
     comment_reply_box = Markup(f'''</div><div class="justify-content-center" style="border-left:none"><form class="needs-validation" style="display:none;" id="{comment.id}" action="" method="post" novalidate>{ replyform.csrf_token() }{ replyform.parent_comment(value=comment.id) }<div class="col-lg-8"><div class="form-group">{ replyform.body.label }<textarea class="form-control" name="comment_reply" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)" required></textarea><div class="invalid-feedback">Please include a message.</div></div><br></div><div class="col-3">{ replyform.reply_submit(class_="btn btn-dark") }</div></form></div>''')
-    comment_with_reply=full_comment_node+comment_reply_box
+    comment_with_reply=html_with_commenter+comment_reply_box
     return comment_with_reply
 
 
@@ -694,8 +701,6 @@ def gravatar_gen(email):
     return g.get_image(size=100,default='identicon')
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 4000)))
-
-
+    app.run(port=int(os.environ.get("PORT", 8080)), host='0.0.0.0', debug=True)
 
 # {'comment': <Comment 1>, 'children': [{'comment': <Comment 2>, 'children': [{'comment': <Comment 3>, 'children': [{'comment': <Comment 8>}]}]}, {'comment': <Comment 15>}, {'comment': <Comment 16>}]}

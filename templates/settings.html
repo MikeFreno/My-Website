@@ -78,6 +78,7 @@
         <img src="{{ user.email | gravatar }}"/><br>
       {% else %}
         <img src="{{ user.profile_picture }}" class="accountImageFull"/><br>
+        <a href="{{url_for('delete_profile_pic', user_id=current_user.id)}}" class="btn btn-dark" role="button" data-bs-toggle="button">Delete Profile Picture</a>
       {% endif %}
       Change Profile Picture:
       <form id='form1' action="" method="post" enctype="multipart/form-data" novalidate>
@@ -88,7 +89,6 @@
          </div>
       </form>
     </div>
-
     <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
       <div style="text-align:center">
       </div>
