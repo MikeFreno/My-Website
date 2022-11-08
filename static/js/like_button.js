@@ -9,6 +9,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var e = React.createElement;
+var f = React.createElement;
 
 var LikeButton = function (_React$Component) {
   _inherits(LikeButton, _React$Component);
@@ -28,7 +29,9 @@ var LikeButton = function (_React$Component) {
       var _this2 = this;
 
       if (this.state.liked) {
-        return 'You liked comment number ' + this.props.commentID + "...this doesn't actually do anything though.";
+        return f('button', { onClick: function onClick() {
+            return _this2.setState({ liked: false });
+          } }, 'Unlike');
       }
 
       return e('button', { onClick: function onClick() {
