@@ -2,7 +2,7 @@
 FROM python:3.10-alpine
 
 # Set the working directory to /app
-WORKDIR /app
+WORKDIR /My_Website
 
 # copy the requirements file used for dependencies
 COPY requirements.txt .
@@ -14,4 +14,4 @@ RUN pip install --trusted-host pypi.python.org -r requirements.txt
 COPY . .
 
 # Run app.py when the container launches
-ENTRYPOINT ["python", "app.py"]
+ENTRYPOINT ["python", "main.py"]
