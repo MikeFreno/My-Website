@@ -638,7 +638,7 @@ def reducer(comments, children_construct,n):
 
 def HTML_comment_constructor(comment):
     html_starter = Markup(f'''{ comment.body }''')
-    modules = Markup(f'''<div class="row col-sm-8"><div class="col-3 like-count" style="color:#F2A900" id={comment.id}>+ { comment.likes } likes</div><div class="col-3"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-3"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
+    modules = Markup(f'''<div class="row col-sm-8"><div class="col-3 like-count" style="color:#F2A900">+ { comment.likes } likes</div><div class="col-3"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-3"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
     html_starter+=modules
 
     if comment.author == None:
@@ -701,5 +701,4 @@ def gravatar_gen(email):
     return g.get_image(size=100,default='identicon')
 
 if __name__ == '__main__':
-    server_port = os.environ.get('PORT', '8080')
-    app.run(debug=False, port=server_port, host='0.0.0.0')
+    app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=True)

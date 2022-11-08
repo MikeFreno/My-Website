@@ -20,11 +20,5 @@
         <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
         <script src="{{ url_for('static', filename='js/like_button.js')}}"></script>
         <script src="{{ url_for('static', filename='js/reply_button.js')}}"></script>
-        <script type="text/javascript">
-            function like(likes , comment_id) {
-                var like_text = document.querySelectorAll('.col-3 like-count').getElementById(comment_id);
-                like_text +1;
-                }
-        </script>
     </body>
 </html>
