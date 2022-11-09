@@ -637,7 +637,7 @@ def reducer(comments, children_construct,n):
 
 def HTML_comment_constructor(comment):
     html_starter = Markup(f'''{ comment.body }''')
-    modules = Markup(f'''<div class="row gap-5"><div class="col-3" style="color:#F2A900">+ { comment.likes } likes</div><div class="col-2" style="margin-left:-2em"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-3"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
+    modules = Markup(f'''<div class="row col-sm-5"><div class="col-6 col-md-4" style="color:#F2A900">+ { comment.likes } likes</div><div class="col-6 col-md-4" style="margin-left:-2em"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-6 col-md-4"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
     html_starter+=modules
 
     if comment.author == None:
