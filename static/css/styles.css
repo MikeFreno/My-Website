@@ -128,11 +128,9 @@ nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-link.active {
 .commentList {
     padding:0;
     list-style:none;
-    margin-bottom:-2em;
-    margin-top:-2em;
+    padding-bottom:-2em;
+    padding-top:-2em;
     padding-inline-start: 0px;
-    margin-left:10vw;
-    margin-right:10vw
 }
 .back {
     color:#adb5bd;
@@ -143,6 +141,12 @@ nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-link.active {
     filter: brightness(150%);
 }
 .vl{
-  border-left: .5px solid white;
-  position: relative;
+    border-left: .5px solid white;
+    position: relative;
+}
+.anchor{
+    display: block;
+    position: relative;
+    top: -75px;
+    visibility: hidden;
 }

@@ -412,7 +412,7 @@ def show_post(post_id):
             )
             db.session.add(new_comment)
             db.session.commit()
-            return redirect(url_for('show_post', post_id=post_id, _anchor="past_last"))
+            return redirect(url_for('show_post', post_id=post_id, _anchor=f'comment_marker_{new_comment.id}'))
         elif request.form.get('reply_submit')=='Post Reply':
             new_reply = Comment(
                 body=request.form['comment_reply'],
@@ -423,7 +423,7 @@ def show_post(post_id):
             )
             db.session.add(new_reply)
             db.session.commit()
-            return redirect(url_for('show_post', post_id=post_id, _anchor="past_last"))
+            return redirect(url_for('show_post', post_id=post_id, _anchor=f'comment_marker_{new_reply.id}'))
     return render_template("post.html", post=requested_post, user=current_user,
                            logged_in=current_user.is_authenticated, form=form, page="Blog",
                            replyform=replyform, year=date.today().year,
@@ -507,7 +507,7 @@ def show_project(proj_id):
             )
             db.session.add(new_comment)
             db.session.commit()
-            return redirect(url_for('show_project', proj_id=proj_id, _anchor="past_last"))
+            return redirect(url_for('show_project', proj_id=proj_id, _anchor=f'comment_marker_{new_comment.id}'))
         elif request.form.get('reply_submit')=='Post Reply':
             new_reply = Comment(
                 body=request.form['comment_reply'],
@@ -518,7 +518,7 @@ def show_project(proj_id):
             )
             db.session.add(new_reply)
             db.session.commit()
-            return redirect(url_for('show_project', proj_id=proj_id, _anchor="past_last"))
+            return redirect(url_for('show_project', proj_id=proj_id, _anchor=f'comment_marker_{new_reply.id}'))
     return render_template("project.html", proj=requested_project, user=current_user,
                            logged_in=current_user.is_authenticated, form=form, page="Projects",
                            replyform=replyform, year=date.today().year,
@@ -529,6 +529,9 @@ def show_project(proj_id):
 @admin_only
 def delete_post(post_id):
     post_to_delete = BlogPost.query.get(post_id)
+    comments_of_post = post_to_delete.comments
+    for comment in comments_of_post:
+        db.session.delete(comment)
     db.session.delete(post_to_delete)
     db.session.commit()
     return redirect(url_for('blog', logged_in=current_user.is_authenticated,
@@ -539,40 +542,36 @@ def delete_post(post_id):
 @admin_only
 def delete_project(proj_id):
     proj_to_delete = Project.query.get(proj_id)
+    comments_of_proj = proj_to_delete.comments
+    for comment in comments_of_proj:
+        db.session.delete(comment)
     db.session.delete(proj_to_delete)
     db.session.commit()
     return redirect(url_for('projects', logged_in=current_user.is_authenticated,
                             doy=datetime.now().timetuple().tm_yday, year=date.today().year, user=current_user))
 
 
-@app.route("/_deletepj/<int:proj_id>/<int:comment_id>", methods=['GET', 'POST', 'DELETE'])
+@app.route("/_deleteco/<int:comment_id>", methods=['GET', 'POST', 'DELETE'])
 @login_required
-def delete_project_comment(proj_id, comment_id):
-    proj_to_delete_from = Project.query.get(proj_id).comments
-    for comment in proj_to_delete_from:
-        if comment.id == comment_id:
-            db.session.delete(comment)
-            db.session.commit()
-    return redirect(url_for('show_project', proj_id=proj_id, _anchor='past_last'))
-
-
-@app.route("/_deletepo/<int:post_id>/<int:comment_id>", methods=['GET', 'POST', 'DELETE'])
-@login_required
-def delete_post_comment(post_id, comment_id):
-    post_to_delete_from = BlogPost.query.get(post_id).comments
-    for comment in post_to_delete_from:
-        if comment.id == comment_id:
-            db.session.delete(comment)
-            db.session.commit()
-    return redirect(url_for('show_post', post_id=post_id, _anchor='past_last'))
+def delete_comment(comment_id):
+    comment_to_delete = Comment.query.get(comment_id)
+    if comment_to_delete.author.id != 1 and current_user.id == 1:
+        comment_to_delete.body = "[Comment Deleted by Admin]"
+    else:
+        comment_to_delete.body = "[Comment Deleted by Author]"
+    db.session.commit()
+    if comment_to_delete.post_id == None:
+        return redirect(url_for('show_project', proj_id=comment_to_delete.project_id, _anchor=f'comment_marker_{comment_id}'))
+    else:
+        return redirect(url_for('show_post', post_id=comment_to_delete.post_id, _anchor=f'comment_marker_{comment_id}'))
 
 @app.route("/_deletepp/<int:user_id>/", methods=['GET', 'POST', 'DELETE'])
 @login_required
 def delete_profile_pic(user_id):
-    picture_to_delete = User.query.get(user_id).profile_picture
-    db.session.delete(picture_to_delete)
+    user_to_delete_from = User.query.get(user_id)
+    user_to_delete_from.profile_picture = None
     db.session.commit()
-    return render_template(url_for('settings'))
+    return redirect(url_for('settings'))
 
 def order_comments(post_id):
     comments = Comment.query.filter(Comment.post_id==post_id)
@@ -636,10 +635,15 @@ def reducer(comments, children_construct,n):
 
 
 def HTML_comment_constructor(comment):
-    html_starter = Markup(f'''{ comment.body }''')
-    modules = Markup(f'''<div class="row col-sm-5"><div class="col-6 col-md-4" style="color:#F2A900">+ { comment.likes } likes</div><div class="col-6 col-md-4" style="margin-left:-2em"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-6 col-md-4"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
+    html_starter = Markup(f'''<div class='anchor' id=comment_marker_{comment.id}></div>{ comment.body }''')
+    modules = Markup(f'''<div class="row col-sm-5" ><div class="col-6 col-md-4" style="color:#F2A900">+ { comment.likes } likes</div><div class="col-6 col-md-4" style="margin-left:-2em"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-6 col-md-4"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
+    delete_module = Markup(f'''<a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="position: absolute;color:gray;margin-left:0.5em;"></a><br>''')
+    try:
+        if current_user == comment.author or current_user.id == 1:
+            modules+=delete_module
+    except:
+        pass
     html_starter+=modules
-
     if comment.author == None:
         deleted_commenter = Markup('<div>[User Account Deleted]</div>')
         html_with_commenter = html_starter+deleted_commenter
