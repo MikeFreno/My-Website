@@ -701,4 +701,4 @@ def gravatar_gen(email):
     return g.get_image(size=100,default='identicon')
 
 if __name__ == '__main__':
-    app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=True)
+    app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=False)
