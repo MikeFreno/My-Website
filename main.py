@@ -704,4 +704,5 @@ def gravatar_gen(email):
 
 if __name__ == '__main__':
     from waitress import serve
-    serve(app, host="0.0.0.0", port=8080)
+    server_port = os.environ.get('PORT', '8080')
+    serve(app, host="0.0.0.0", port=server_port)
