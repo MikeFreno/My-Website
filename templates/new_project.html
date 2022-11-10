@@ -58,8 +58,8 @@
 
 <div class="container text-left">
   <form id='new-project' action="" method="post" enctype="multipart/form-data" novalidate>
-    {{ ckeditor.load() }}
-      {{ ckeditor.config(name='body') }}
+    {{ ckeditor.load(custom_url=url_for('static', filename='ckeditor/ckeditor.js')) }}
+      {{ ckeditor.config(name='body',height="20em") }}
     <div class="row justify-content-md-left">
       {{ form.hidden_tag() }}
       <div class="col col-lg-4">
