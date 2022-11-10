@@ -616,7 +616,6 @@ def reducer(comments, children_construct,n):
                 try:
                     if children['children'][1]['comment']:
                         for x in range(1, len(children['children'])):
-                            print(children['children'][x]['comment'])
                             this_grand = HTML_comment_constructor(children['children'][x]['comment'])
                             styled = Markup(f'''<li style="margin-left:{10 + ((n+1) * 4)}vw;margin-right:10vw;"><div class="vl">{this_grand}</div></li><br>''')
                             children_construct += styled
@@ -704,4 +703,5 @@ def gravatar_gen(email):
     return g.get_image(size=100,default='identicon')
 
 if __name__ == '__main__':
-    app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=False)
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=8080)
