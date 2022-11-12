@@ -150,3 +150,12 @@ nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-link.active {
     top: -75px;
     visibility: hidden;
 }
+a:hover{
+    cursor:pointer;
+}
+.user-link{
+    border-bottom: none !important;
+}
+.user-link:hover{
+    color:#F2A900;
+}

@@ -1,0 +1,6 @@
+/Flask.env
+/sendgrid.env
+/package.json
+/package-lock.json
+/static/uploads/
+/instance/

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, abort, request
+from flask import Flask, render_template, redirect, url_for, flash, abort, request, jsonify
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor, CKEditorField
 from datetime import date, datetime
@@ -19,6 +19,7 @@ from sendgrid.helpers.mail import *
 from image_var import image
 from markupsafe import Markup
 from libgravatar import Gravatar as G
+import json
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -427,7 +428,7 @@ def show_post(post_id):
     return render_template("post.html", post=requested_post, user=current_user,
                            logged_in=current_user.is_authenticated, form=form, page="Blog",
                            replyform=replyform, year=date.today().year,
-                           comments=construct)
+                           comments=construct, simple_comment_list=simple_comments_post(post_id))
 
 @app.route("/new-project", methods=['GET', 'POST'])
 @admin_only
@@ -522,8 +523,7 @@ def show_project(proj_id):
     return render_template("project.html", proj=requested_project, user=current_user,
                            logged_in=current_user.is_authenticated, form=form, page="Projects",
                            replyform=replyform, year=date.today().year,
-                           comments=construct)
-
+                           comments=construct, simple_comment_list=simple_comments_proj(proj_id))
 
 @app.route("/_deletepo/<int:post_id>", methods=['GET', 'POST', 'DELETE'])
 @admin_only
@@ -572,6 +572,36 @@ def delete_profile_pic(user_id):
     user_to_delete_from.profile_picture = None
     db.session.commit()
     return redirect(url_for('settings'))
+
+@app.route("/like_comment/<int:comment_id>", methods=['GET', 'POST'])
+@login_required
+def like_comment(comment_id):
+    comment_to_like = Comment.query.get(comment_id)
+    comment_to_like.likes+=1
+    db.session.commit()
+    return "success"
+
+@app.route("/unlike_comment/<int:comment_id>", methods=['GET', 'POST'])
+@login_required
+def unlike_comment(comment_id):
+    comment_to_unlike = Comment.query.get(comment_id)
+    comment_to_unlike.likes-=1
+    db.session.commit()
+    return "success"
+
+def simple_comments_post(post_id):
+    comments = Comment.query.filter(Comment.post_id==post_id)
+    comment_list = []
+    for comment in comments:
+        comment_list.append(comment)
+    return comment_list
+
+def simple_comments_proj(proj_id):
+    comments = Comment.query.filter(Comment.project_id==proj_id)
+    comment_list = []
+    for comment in comments:
+        comment_list.append(comment)
+    return comment_list
 
 def order_comments(post_id):
     comments = Comment.query.filter(Comment.post_id==post_id)
@@ -635,8 +665,8 @@ def reducer(comments, children_construct,n):
 
 def HTML_comment_constructor(comment):
     html_starter = Markup(f'''<div class='anchor' id=comment_marker_{comment.id}></div>{ comment.body }''')
-    modules = Markup(f'''<div class="row col-sm-5" ><div class="col-6 col-md-4" style="color:#F2A900">+ { comment.likes } likes</div><div class="col-6 col-md-4" style="margin-left:-2em"><div class="like_button_container" data-commentid="{comment.id}"></div></div><div class="col-6 col-md-4"><button class="icon solid fa-reply" style="color:gray;margin-left:0.5em;" onclick="showReplyBox( {comment.id} )"></button></div></div>''')
-    delete_module = Markup(f'''<a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="position: absolute;color:gray;margin-left:0.5em;"></a><br>''')
+    modules = Markup(f'''<div class="row col-4" ><div class="col-2 col-sm-5" style="color:#F2A900" id="like_counter{comment.id}">+ { comment.likes } likes</div><div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" onclick="changeText({comment.id})" id="button_marker{comment.id}"></a></div></div><div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" style="color:white;" id=reply_button{comment.id} onclick="showReplyBox( {comment.id} )"></a></div></div></div>''')
+    delete_module = Markup(f'''<div class="hvr-grow"><a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="color:gray;padding-left:0.5em;"></a></div><br>''')
     try:
         if current_user == comment.author or current_user.id == 1:
             modules+=delete_module
@@ -654,7 +684,7 @@ def HTML_comment_constructor(comment):
         else:
             intact_commenter_image+=Markup(f'''<img src="../{ comment.author.profile_picture }" class="accountImageCropped"/><br></div>''')
         html_with_commenter_image = html_starter+intact_commenter_image
-        commenter = Markup(f'''<a href="{ url_for('user_page', user_id=comment.author.id) }">''' + f'''<span class="date sub-text">- @{ comment.author.name }</span></a>''')
+        commenter = Markup(f'''<a href="{ url_for('user_page', user_id=comment.author.id) }" class="user-link">- @{ comment.author.name }</a>''')
         html_with_commenter = html_with_commenter_image + commenter
     replyform = CommentReplyForm()
     comment_reply_box = Markup(f'''</div><div class="justify-content-center" style="border-left:none"><form class="needs-validation" style="display:none;" id="{comment.id}" action="" method="post" novalidate>{ replyform.csrf_token() }{ replyform.parent_comment(value=comment.id) }<div class="col-lg-8"><div class="form-group">{ replyform.body.label }<textarea class="form-control" name="comment_reply" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)" required></textarea><div class="invalid-feedback">Please include a message.</div></div><br></div><div class="col-3">{ replyform.reply_submit(class_="btn btn-dark") }</div></form></div>''')
