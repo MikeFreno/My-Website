@@ -100,6 +100,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(512))
     name = db.Column(db.String(128))
     profile_picture = db.Column(db.String(256), nullable=True)
+    liked_comments = db.Column(db.String(256))
     posts = relationship("BlogPost", back_populates="author")
     comments = relationship("Comment", back_populates="author", lazy='dynamic', )
     projects = relationship("Project", back_populates="author")
@@ -242,7 +243,8 @@ def register():
                     email=form.email.data,
                     password=generate_password_hash(form.password.data, method='pbkdf2:sha256',
                                                     salt_length=8),
-                    name=nameFix
+                    name=nameFix,
+                    liked_comments='',
                 )
                 db.session.add(new_user)
                 db.session.commit()
@@ -412,6 +414,8 @@ def show_post(post_id):
                 parent_comment=None,
             )
             db.session.add(new_comment)
+            new = Comment.query.filter(Comment.body == new_comment.body).order_by(Comment.id.desc()).first()
+            like_comment_on_post(new)
             db.session.commit()
             return redirect(url_for('show_post', post_id=post_id, _anchor=f'comment_marker_{new_comment.id}'))
         elif request.form.get('reply_submit')=='Post Reply':
@@ -423,6 +427,8 @@ def show_post(post_id):
                 parent_comment=request.form['parent_comment'],
             )
             db.session.add(new_reply)
+            new = Comment.query.filter(Comment.body == new_reply.body).order_by(Comment.id.desc()).first()
+            like_comment_on_post(new)
             db.session.commit()
             return redirect(url_for('show_post', post_id=post_id, _anchor=f'comment_marker_{new_reply.id}'))
     return render_template("post.html", post=requested_post, user=current_user,
@@ -507,6 +513,8 @@ def show_project(proj_id):
                 parent_comment=None,
             )
             db.session.add(new_comment)
+            new = Comment.query.filter(Comment.body == new_comment.body).order_by(Comment.id.desc()).first()
+            like_comment_on_post(new)
             db.session.commit()
             return redirect(url_for('show_project', proj_id=proj_id, _anchor=f'comment_marker_{new_comment.id}'))
         elif request.form.get('reply_submit')=='Post Reply':
@@ -518,6 +526,8 @@ def show_project(proj_id):
                 parent_comment=request.form['parent_comment'],
             )
             db.session.add(new_reply)
+            new = Comment.query.filter(Comment.body == new_reply.body).order_by(Comment.id.desc()).first()
+            like_comment_on_post(new)
             db.session.commit()
             return redirect(url_for('show_project', proj_id=proj_id, _anchor=f'comment_marker_{new_reply.id}'))
     return render_template("project.html", proj=requested_project, user=current_user,
@@ -578,6 +588,13 @@ def delete_profile_pic(user_id):
 def like_comment(comment_id):
     comment_to_like = Comment.query.get(comment_id)
     comment_to_like.likes+=1
+    user_liked_comments = like_string_to_list(current_user.liked_comments)
+    if user_liked_comments == None:
+        user_liked_comments = [comment_to_like.id]
+    else:
+        user_liked_comments.append(comment_to_like.id)
+    new_string = like_list_to_string(user_liked_comments)
+    current_user.liked_comments = new_string
     db.session.commit()
     return "success"
 
@@ -586,8 +603,27 @@ def like_comment(comment_id):
 def unlike_comment(comment_id):
     comment_to_unlike = Comment.query.get(comment_id)
     comment_to_unlike.likes-=1
+    user_liked_comments = like_string_to_list(current_user.liked_comments)
+    user_liked_comments = [comment for comment in user_liked_comments if comment!=str(comment_id)]
+    current_user.liked_comments = like_list_to_string(user_liked_comments)
     db.session.commit()
     return "success"
+
+def like_list_to_string(list):
+    if list == None:
+        return None
+    else:
+        string = ""
+        for id in list:
+            string+=str(id)+";"
+        return string
+
+def like_string_to_list(string):
+    list = string.split(";")
+    for entry in list:
+        if entry == '':
+            list.remove(entry)
+    return list
 
 def simple_comments_post(post_id):
     comments = Comment.query.filter(Comment.post_id==post_id)
@@ -629,7 +665,6 @@ def find_children(comment):
     else:
         return { 'comment': comment }
 
-
 def reducer(comments, children_construct,n):
     try:
         for children in comments['children']:
@@ -662,10 +697,21 @@ def reducer(comments, children_construct,n):
         pass
     return children_construct
 
-
 def HTML_comment_constructor(comment):
     html_starter = Markup(f'''<div class='anchor' id=comment_marker_{comment.id}></div>{ comment.body }''')
-    modules = Markup(f'''<div class="row col-4" ><div class="col-2 col-sm-5" style="color:#F2A900" id="like_counter{comment.id}">+ { comment.likes } likes</div><div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" onclick="changeText({comment.id})" id="button_marker{comment.id}"></a></div></div><div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" style="color:white;" id=reply_button{comment.id} onclick="showReplyBox( {comment.id} )"></a></div></div></div>''')
+    like_counter_module = Markup(f'''<div class="row col-4" ><div class="col-2 col-sm-5" style="color:#F2A900" id="like_counter{comment.id}">+ { comment.likes } likes</div>''')
+    # set like button class based on if user has liked the comment
+    like_check = False
+    user_liked_comments = like_string_to_list(current_user.liked_comments)
+    for comment_id in user_liked_comments:
+        if comment_id == str(comment.id):
+            like_check = True
+    if like_check == False:
+        like_button_module = Markup(f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" onclick="changeText({comment.id})" id="button_marker{comment.id}"></a></div></div>''')
+    else:
+        like_button_module = Markup(f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon solid fa-thumbs-up" style="color:#F2A900;" onclick="changeText({comment.id})" id="button_marker{comment.id}"></a></div></div>''')
+    reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" style="color:white;" id=reply_button{comment.id} onclick="showReplyBox( {comment.id} )"></a></div></div></div>''')
+    modules = like_counter_module+like_button_module+reply_module
     delete_module = Markup(f'''<div class="hvr-grow"><a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="color:gray;padding-left:0.5em;"></a></div><br>''')
     try:
         if current_user == comment.author or current_user.id == 1:
@@ -706,6 +752,16 @@ def send_contact_email(name, email, message):
         print(response.headers)
     except Exception as e:
         print(e)
+
+def like_comment_on_post(comment):
+    comment.likes+=1
+    user_liked_comments = like_string_to_list(current_user.liked_comments)
+    if user_liked_comments == None:
+        user_liked_comments = [comment.id]
+    else:
+        user_liked_comments.append(comment.id)
+    new_string = like_list_to_string(user_liked_comments)
+    current_user.liked_comments = new_string
 
 
 def send_registration_email(name, email):
