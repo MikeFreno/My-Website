@@ -19,7 +19,6 @@ from sendgrid.helpers.mail import *
 from image_var import image
 from markupsafe import Markup
 from libgravatar import Gravatar as G
-import json
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -325,6 +324,8 @@ def settings():
             db.session.delete(current_user)
             db.session.commit()
             return redirect(url_for('home'))
+        else:
+            flash("Incorrect Password")
     return render_template('settings.html', logged_in=current_user.is_authenticated, year=date.today().year,
                            user=current_user, picture_form=picture_form, password_form=password_form,
                            delete_form=delete_form, page="Settings")
@@ -699,7 +700,7 @@ def reducer(comments, children_construct,n):
 
 def HTML_comment_constructor(comment):
     html_starter = Markup(f'''<div class='anchor' id=comment_marker_{comment.id}></div>{ comment.body }''')
-    like_counter_module = Markup(f'''<div class="row col-4" ><div class="col-2 col-sm-5" style="color:#F2A900" id="like_counter{comment.id}">+ { comment.likes } likes</div>''')
+    like_counter_module = Markup(f'''<div class="row col-5 col-lg-4" ><div class="col-8 col-lg-4" style="color:#F2A900" id="like_counter{comment.id}">+ { comment.likes } likes</div>''')
     # set like button class based on if user has liked the comment
     like_check = False
     user_liked_comments = like_string_to_list(current_user.liked_comments)

@@ -4,8 +4,8 @@
 <!--Nav Bar-->
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{{url_for('home')}}" style="border-bottom: none;">
-      <img src="{{ url_for('static', filename='images/favicon.ico')}}" alt="Logo" width="24" height="24" class="d-inline-block align-text-top">
+    <a class="navbar-brand hvr-icon-spin" href="{{url_for('home')}}" style="border-bottom: none;">
+      <img src="{{ url_for('static', filename='images/favicon.ico')}}" alt="Logo" width="24" height="24" class="d-inline-block align-text-top hvr-icon">
       Mike Freno</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -34,7 +34,7 @@
                   <img src="../{{ user.profile_picture }}" class="accountImageCropped"/><br>
               {% endif %}
               </div>{% endif %}
-            {% if not logged_in: %}Account{% endif %}
+            {% if not logged_in: %}Login/Register{% endif %}
           </a>
           <ul class="dropdown-menu dropdown-menu-dark">
             {% if not logged_in: %}
@@ -97,6 +97,28 @@
       </div>
     </div>
   </div>
+   <div class="container text-center">
+     <div class="row justify-content-center">
+       <div class="col-4">
+         <h3>Author:</h3>
+       </div>
+     </div>
+     <div class="row justify-content-center">
+       <div class="col-4">
+         <div>
+           <img src="../{{ proj.author.profile_picture }}" class="articleAccountImage">
+         </div>
+       </div>
+     </div>
+     <div class="row justify-content-center">
+       <div class="col-4">
+        <h3>
+          <a href="{{url_for('user_page',user_id = proj.author.id )}}" class="user-link" style="border-bottom: none;">{{proj.author.name.replace('_', ' ')}}
+          </a>
+        </h3>
+       </div>
+     </div>
+   </div>
 <div class="container text-center">
   <div class="row justify-content-md-left">
     <div class="col col-lg-2">
