@@ -715,8 +715,8 @@ def HTML_comment_constructor(comment):
         reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" style="color:white;" id=reply_button{comment.id} onclick="showReplyBox( {comment.id} )"></a></div></div></div>''')
     else:
         like_button_module = Markup(
-            f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" style="color:gray;" id="button_marker{comment.id}" data-bs-toggle="popover" data-bs-placement="left" data-bs-content="Log in to Like"></a></div></div>''')
-        reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" style="color:gray;" id=reply_button{comment.id}" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="Log in to Reply"></a></div></div></div>''')
+            f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" tabindex="{comment.id*10}" style="color:gray;" id="button_marker{comment.id}" data-bs-toggle="popover" data-bs-placement="left" data-bs-trigger="focus" data-bs-content="Log in to Like"></a></div></div>''')
+        reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" tabindex="{(comment.id*10)+1}" style="color:gray;" id=reply_button{comment.id}" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Log in to Reply"></a></div></div></div>''')
     modules = like_counter_module+like_button_module+reply_module
     delete_module = Markup(f'''<div class="hvr-grow"><a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="color:gray;padding-left:0.5em;"></a></div><br>''')
     try:
