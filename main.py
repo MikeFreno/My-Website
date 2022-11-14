@@ -701,17 +701,22 @@ def reducer(comments, children_construct,n):
 def HTML_comment_constructor(comment):
     html_starter = Markup(f'''<div class='anchor' id=comment_marker_{comment.id}></div>{ comment.body }''')
     like_counter_module = Markup(f'''<div class="row col-5 col-lg-4" ><div class="col-8 col-lg-4" style="color:#F2A900" id="like_counter{comment.id}">+ { comment.likes } likes</div>''')
-    # set like button class based on if user has liked the comment
-    like_check = False
-    user_liked_comments = like_string_to_list(current_user.liked_comments)
-    for comment_id in user_liked_comments:
-        if comment_id == str(comment.id):
-            like_check = True
-    if like_check == False:
-        like_button_module = Markup(f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" onclick="changeText({comment.id})" id="button_marker{comment.id}"></a></div></div>''')
+    if current_user.is_authenticated:
+        # set like button class based on if user has liked the comment
+        like_check = False
+        user_liked_comments = like_string_to_list(current_user.liked_comments)
+        for comment_id in user_liked_comments:
+            if comment_id == str(comment.id):
+                like_check = True
+        if like_check == False:
+            like_button_module = Markup(f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" onclick="changeText({comment.id})" id="button_marker{comment.id}"></a></div></div>''')
+        else:
+            like_button_module = Markup(f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon solid fa-thumbs-up" style="color:#F2A900;" onclick="changeText({comment.id})" id="button_marker{comment.id}"></a></div></div>''')
+        reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" style="color:white;" id=reply_button{comment.id} onclick="showReplyBox( {comment.id} )"></a></div></div></div>''')
     else:
-        like_button_module = Markup(f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon solid fa-thumbs-up" style="color:#F2A900;" onclick="changeText({comment.id})" id="button_marker{comment.id}"></a></div></div>''')
-    reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" style="color:white;" id=reply_button{comment.id} onclick="showReplyBox( {comment.id} )"></a></div></div></div>''')
+        like_button_module = Markup(
+            f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" style="color:gray;" id="button_marker{comment.id}" data-bs-toggle="popover" data-bs-placement="left" data-bs-content="Log in to Like"></a></div></div>''')
+        reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" style="color:gray;" id=reply_button{comment.id}" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="Log in to Reply"></a></div></div></div>''')
     modules = like_counter_module+like_button_module+reply_module
     delete_module = Markup(f'''<div class="hvr-grow"><a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="color:gray;padding-left:0.5em;"></a></div><br>''')
     try:

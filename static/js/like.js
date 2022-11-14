@@ -24,3 +24,5 @@ function changeText(comment_id){
         counter.innerHTML = `+ ${like_number} likes`
     }
 }
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
