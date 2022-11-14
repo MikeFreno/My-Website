@@ -4,7 +4,7 @@ Comment Section - logged in view
 <img width="1440" alt="Screenshot 2022-11-14 at 8 37 52 AM" src="https://user-images.githubusercontent.com/108227314/201674378-747194a6-810d-4198-9558-64752c91fe34.png">
 Comment Section - logged out view
 <img width="1440" alt="Screenshot 2022-11-14 at 8 38 32 AM" src="https://user-images.githubusercontent.com/108227314/201674390-c320ef5d-6cf3-4ac7-bd2c-035cd7ea4a3a.png">
-Mobile
+Mobile<br>
 <img width="349" alt="Screenshot 2022-11-14 at 9 48 07 AM" src="https://user-images.githubusercontent.com/108227314/201690116-b9450238-b096-47ca-9e21-33258cf2951e.png">
 Registration Email
 <img width="536" alt="Screenshot 2022-11-04 at 10 13 29 AM" src="https://user-images.githubusercontent.com/108227314/199996394-f7622d58-740d-454f-a6b9-3db547fd3d88.png">
