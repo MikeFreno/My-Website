@@ -85,7 +85,8 @@
         <div class="form-group" >
           <label for="img">Select Picture from device:</label>
           <input type="file" id="img" name="file" accept="image/*" >
-          {{ picture_form.submit(class_="btn btn-dark") }}
+          <button id="picture_submit" onclick="spinnerHandler()">Upload
+          </button>
          </div>
       </form>
     </div>
@@ -139,6 +140,5 @@
         </form>
     </div>
   </div>
-
 </div>
-{% include "footer.html" %}
+{% include "footer_2.html" %}
