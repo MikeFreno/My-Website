@@ -1,7 +1,7 @@
 # My_Website
 My Professional Website<br>
 Comment Section - logged in view
-<img width="1440" alt="Screenshot 2022-11-16 at 12 32 33 AM" src="https://user-images.githubusercontent.com/108227314/202092516-f5f0c62e-0baa-425b-b64f-1c7c7985d1d8.png">
+<img width="1440" alt="Screenshot 2022-11-16 at 11 43 46 AM" src="https://user-images.githubusercontent.com/108227314/202241339-d90759da-8489-4234-9eb1-c1c563152c8e.png">
 Comment Section - logged out view
 <img width="1440" alt="Screenshot 2022-11-16 at 12 33 52 AM" src="https://user-images.githubusercontent.com/108227314/202092558-4421e988-c1f1-4d88-b488-9dcbaea0b333.png">
 Mobile<br>
