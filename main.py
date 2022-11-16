@@ -1,24 +1,26 @@
-from flask import Flask, render_template, redirect, url_for, flash, abort, request, jsonify
+import os
+from datetime import date, datetime
+from functools import wraps
+
+from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor, CKEditorField
-from datetime import date, datetime
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, BooleanField, HiddenField
-from wtforms.validators import DataRequired, Length
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import relationship
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_gravatar import Gravatar
-from functools import wraps
-from sqlalchemy.exc import IntegrityError
-import os
+from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from libgravatar import Gravatar as G
+from markupsafe import Markup
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import *
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import relationship
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from wtforms import StringField, SubmitField, PasswordField, BooleanField, HiddenField
+from wtforms.validators import DataRequired, Length
+
 from image_var import image
-from markupsafe import Markup
-from libgravatar import Gravatar as G
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -86,6 +88,7 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
     project_id = db.Column(db.Integer, db.ForeignKey("projects.id"))
     parent_comment = db.Column(db.Integer, nullable=True)
+    parent_chain = db.Column(db.String(256), nullable=True)
     likes = db.Column(db.Integer, nullable=False)
     author = relationship("User", back_populates="comments")
     parent_post = relationship("BlogPost", back_populates="comments")
@@ -401,7 +404,7 @@ def show_post(post_id):
     construct = ''
     for n in range(0, len(comment_structure)):
         parent_node = HTML_comment_constructor(comment_structure[n]['comment'])
-        parent_HTML = Markup(f'''</ul><ul class="commentList"><li style="margin-left:10vw;margin-right:10vw;list-style:none;"><hr><div>{parent_node}</div></li><br>''')
+        parent_HTML = Markup(f'''</ul><ul class="commentList"><li style="margin-left:10vw;margin-right:10vw;list-style:none;"><hr><div>{parent_node}</div></li>''')
         rest_of_node = reducer(comment_structure[n],'',1)
         full_node = parent_HTML+rest_of_node
         construct+=full_node
@@ -413,6 +416,7 @@ def show_post(post_id):
                 parent_post=requested_post,
                 likes=0,
                 parent_comment=None,
+                parent_chain="",
             )
             db.session.add(new_comment)
             new = Comment.query.filter(Comment.body == new_comment.body).order_by(Comment.id.desc()).first()
@@ -427,6 +431,8 @@ def show_post(post_id):
                 likes=0,
                 parent_comment=request.form['parent_comment'],
             )
+            the_parent_comment = Comment.query.get(new_reply.parent_comment)
+            new_reply.parent_chain=the_parent_comment.parent_chain + f"{the_parent_comment.id};"
             db.session.add(new_reply)
             new = Comment.query.filter(Comment.body == new_reply.body).order_by(Comment.id.desc()).first()
             like_comment_on_post(new)
@@ -435,7 +441,7 @@ def show_post(post_id):
     return render_template("post.html", post=requested_post, user=current_user,
                            logged_in=current_user.is_authenticated, form=form, page="Blog",
                            replyform=replyform, year=date.today().year,
-                           comments=construct, simple_comment_list=simple_comments_post(post_id))
+                           comments=construct)
 
 @app.route("/new-project", methods=['GET', 'POST'])
 @admin_only
@@ -500,7 +506,7 @@ def show_project(proj_id):
     construct = ''
     for n in range(0, len(comment_structure)):
         parent_node = HTML_comment_constructor(comment_structure[n]['comment'])
-        parent_HTML = Markup(f'''</ul><ul class="commentList"><li style="margin-left:10vw;margin-right:10vw;list-style:none;"><hr><div>{parent_node}</div></li><br>''')
+        parent_HTML = Markup(f'''</ul><ul class="commentList"><li style="margin-left:10vw;margin-right:10vw;list-style:none;"><hr><div>{parent_node}</div></li>''')
         rest_of_node = reducer(comment_structure[n],'',1)
         full_node = parent_HTML+rest_of_node
         construct+=full_node
@@ -534,7 +540,7 @@ def show_project(proj_id):
     return render_template("project.html", proj=requested_project, user=current_user,
                            logged_in=current_user.is_authenticated, form=form, page="Projects",
                            replyform=replyform, year=date.today().year,
-                           comments=construct, simple_comment_list=simple_comments_proj(proj_id))
+                           comments=construct)
 
 @app.route("/_deletepo/<int:post_id>", methods=['GET', 'POST', 'DELETE'])
 @admin_only
@@ -589,12 +595,12 @@ def delete_profile_pic(user_id):
 def like_comment(comment_id):
     comment_to_like = Comment.query.get(comment_id)
     comment_to_like.likes+=1
-    user_liked_comments = like_string_to_list(current_user.liked_comments)
+    user_liked_comments = string_to_list(current_user.liked_comments)
     if user_liked_comments == None:
         user_liked_comments = [comment_to_like.id]
     else:
         user_liked_comments.append(comment_to_like.id)
-    new_string = like_list_to_string(user_liked_comments)
+    new_string = list_to_string(user_liked_comments)
     current_user.liked_comments = new_string
     db.session.commit()
     return "success"
@@ -604,13 +610,13 @@ def like_comment(comment_id):
 def unlike_comment(comment_id):
     comment_to_unlike = Comment.query.get(comment_id)
     comment_to_unlike.likes-=1
-    user_liked_comments = like_string_to_list(current_user.liked_comments)
+    user_liked_comments = string_to_list(current_user.liked_comments)
     user_liked_comments = [comment for comment in user_liked_comments if comment!=str(comment_id)]
-    current_user.liked_comments = like_list_to_string(user_liked_comments)
+    current_user.liked_comments = list_to_string(user_liked_comments)
     db.session.commit()
     return "success"
 
-def like_list_to_string(list):
+def list_to_string(list):
     if list == None:
         return None
     else:
@@ -619,26 +625,27 @@ def like_list_to_string(list):
             string+=str(id)+";"
         return string
 
-def like_string_to_list(string):
+def string_to_list(string):
     list = string.split(";")
     for entry in list:
         if entry == '':
             list.remove(entry)
     return list
 
-def simple_comments_post(post_id):
-    comments = Comment.query.filter(Comment.post_id==post_id)
-    comment_list = []
-    for comment in comments:
-        comment_list.append(comment)
-    return comment_list
+def hide_reply_insert(comment_id):
+    if Comment.query.get(comment_id).post_id == None:
+        all_comments = Comment.query.filter(Comment.project_id==Comment.query.get(comment_id).proj_id)
+    else:
+        all_comments = Comment.query.filter(Comment.post_id==Comment.query.get(comment_id).post_id)
+    comments_to_hide = []
+    for comment in all_comments:
+        this_comment_parent_chain = comment.parent_chain
+        listed = string_to_list(this_comment_parent_chain)
+        for x in listed:
+            if int(x) == comment_id:
+                comments_to_hide.append(comment.id)
+    return list_to_string(comments_to_hide)
 
-def simple_comments_proj(proj_id):
-    comments = Comment.query.filter(Comment.project_id==proj_id)
-    comment_list = []
-    for comment in comments:
-        comment_list.append(comment)
-    return comment_list
 
 def order_comments(post_id):
     comments = Comment.query.filter(Comment.post_id==post_id)
@@ -672,10 +679,10 @@ def reducer(comments, children_construct,n):
             if len(children)>1:
                 this_top = children['comment']
                 this_top_HTML = HTML_comment_constructor(this_top)
-                styled = Markup(f'''<li style="margin-left:{10+(n*4)}vw;margin-right:10vw;"><div class="vl">{this_top_HTML}</div></li><br>''')
+                styled = Markup(f'''<li style="margin-left:{10+(n*4)}vw;margin-right:10vw;"><div class="vl">{this_top_HTML}</div></li>''')
                 children_construct +=styled
                 grandchild_fix = HTML_comment_constructor(children['children'][0]['comment'])
-                styled = Markup(f'''<li style="margin-left:{10+((n+1)*4)}vw;margin-right:10vw;"><div class="vl">{grandchild_fix}</div></li><br>''')
+                styled = Markup(f'''<li style="margin-left:{10+((n+1)*4)}vw;margin-right:10vw;"><div class="vl">{grandchild_fix}</div></li>''')
                 children_construct+=styled
                 children_construct+=reducer(children['children'][0],'',n+1)
                 #this is an ugly fix
@@ -683,7 +690,7 @@ def reducer(comments, children_construct,n):
                     if children['children'][1]['comment']:
                         for x in range(1, len(children['children'])):
                             this_grand = HTML_comment_constructor(children['children'][x]['comment'])
-                            styled = Markup(f'''<li style="margin-left:{10 + ((n+1) * 4)}vw;margin-right:10vw;"><div class="vl">{this_grand}</div></li><br>''')
+                            styled = Markup(f'''<li style="margin-left:{10 + ((n+1) * 4)}vw;margin-right:10vw;"><div class="vl">{this_grand}</div></li>''')
                             children_construct += styled
                             children_construct += reducer(children['children'][x], '', n + 2)
                 except:
@@ -692,19 +699,19 @@ def reducer(comments, children_construct,n):
                 #end leaf
                 end_leaf = children['comment']
                 end_leaf_HTML = HTML_comment_constructor(end_leaf)
-                styled = Markup(f'''<li style="margin-left:{10+(n*4)}vw;margin-right:10vw;"><div class="vl">{end_leaf_HTML}</div></li><br>''')
+                styled = Markup(f'''<li style="margin-left:{10+(n*4)}vw;margin-right:10vw;"><div class="vl">{end_leaf_HTML}</div></li>''')
                 children_construct += styled
     except:
         pass
     return children_construct
 
 def HTML_comment_constructor(comment):
-    html_starter = Markup(f'''<div class='anchor' id=comment_marker_{comment.id}></div>{ comment.body }''')
+    html_starter = Markup(f'''<div id="visibility_tag_{comment.id}" class="visible" style="margin-bottom:2em"><div class='anchor' id=comment_marker_{comment.id}></div>{ comment.body }''')
     like_counter_module = Markup(f'''<div class="row col-5 col-lg-4" ><div class="col-8 col-lg-4" style="color:#F2A900" id="like_counter{comment.id}">+ { comment.likes } likes</div>''')
     if current_user.is_authenticated:
         # set like button class based on if user has liked the comment
         like_check = False
-        user_liked_comments = like_string_to_list(current_user.liked_comments)
+        user_liked_comments = string_to_list(current_user.liked_comments)
         for comment_id in user_liked_comments:
             if comment_id == str(comment.id):
                 like_check = True
@@ -718,13 +725,18 @@ def HTML_comment_constructor(comment):
             f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" tabindex="{comment.id*10}" style="color:gray;" id="button_marker{comment.id}" data-bs-toggle="popover" data-bs-placement="left" data-bs-trigger="focus" data-bs-content="Log in to Like"></a></div></div>''')
         reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" tabindex="{(comment.id*10)+1}" style="color:gray;" id=reply_button{comment.id}" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Log in to Reply"></a></div></div></div>''')
     modules = like_counter_module+like_button_module+reply_module
-    delete_module = Markup(f'''<div class="hvr-grow"><a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="color:gray;padding-left:0.5em;"></a></div><br>''')
+    delete_module = Markup(f'''<div class="row col-sm-5 col-lg-4" ><div class="col-2"><div class="hvr-grow"><a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="color:gray;padding-left:0.5em;"></a></div></div>''')
     try:
         if current_user == comment.author or current_user.id == 1:
             modules+=delete_module
     except:
         pass
-    html_starter+=modules
+    this_comment_children = hide_reply_insert(comment.id)
+    if current_user.is_authenticated:
+        hide_replies_button = Markup(f'''<div class="col-2"><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"></a></div></div><div class="col-4 col-sm-6" style="font-size: 10pt;margin-top:3px;margin-left:-1em" id="reply_text{comment.id}">Hide Replies</div></div>''')
+    else:
+        hide_replies_button = Markup(f'''<div class="row col-sm-5 col-lg-4"><div class="col-2"><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"></a></div></div><div class="col-4 col-sm-6"" style="font-size: 10pt;margin-top:3px;margin-left:3px" id="reply_text{comment.id}">Hide Replies</div></div>''')
+    html_starter+=modules+hide_replies_button
     if comment.author == None:
         deleted_commenter = Markup('<div>[User Account Deleted]</div>')
         html_with_commenter = html_starter+deleted_commenter
@@ -761,12 +773,12 @@ def send_contact_email(name, email, message):
 
 def like_comment_on_post(comment):
     comment.likes+=1
-    user_liked_comments = like_string_to_list(current_user.liked_comments)
+    user_liked_comments = string_to_list(current_user.liked_comments)
     if user_liked_comments == None:
         user_liked_comments = [comment.id]
     else:
         user_liked_comments.append(comment.id)
-    new_string = like_list_to_string(user_liked_comments)
+    new_string = list_to_string(user_liked_comments)
     current_user.liked_comments = new_string
 
 
