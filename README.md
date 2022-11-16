@@ -1,9 +1,9 @@
 # My_Website
-My Professional Website
+My Professional Website<br>
 Comment Section - logged in view
-<img width="1440" alt="Screenshot 2022-11-14 at 8 37 52 AM" src="https://user-images.githubusercontent.com/108227314/201674378-747194a6-810d-4198-9558-64752c91fe34.png">
+<img width="1440" alt="Screenshot 2022-11-16 at 12 32 33 AM" src="https://user-images.githubusercontent.com/108227314/202092516-f5f0c62e-0baa-425b-b64f-1c7c7985d1d8.png">
 Comment Section - logged out view
-<img width="1440" alt="Screenshot 2022-11-14 at 8 38 32 AM" src="https://user-images.githubusercontent.com/108227314/201674390-c320ef5d-6cf3-4ac7-bd2c-035cd7ea4a3a.png">
+<img width="1440" alt="Screenshot 2022-11-16 at 12 33 52 AM" src="https://user-images.githubusercontent.com/108227314/202092558-4421e988-c1f1-4d88-b488-9dcbaea0b333.png">
 Mobile<br>
 <img width="349" alt="Screenshot 2022-11-14 at 9 48 07 AM" src="https://user-images.githubusercontent.com/108227314/201690116-b9450238-b096-47ca-9e21-33258cf2951e.png"><br>
 Registration Email<br>
