@@ -723,7 +723,7 @@ def HTML_comment_constructor(comment):
             f'''<div class="col-2" style="margin-left:-1em"><div class="hvr-float-shadow"><a class="icon fa-thumbs-up" tabindex="{comment.id*10}" style="color:gray;" id="button_marker{comment.id}" data-bs-toggle="popover" data-bs-placement="left" data-bs-trigger="focus" data-bs-content="Log in to Like"></a></div></div>''')
         reply_module = Markup(f'''<div class="col-2"><div class="hvr-float-shadow"><a class="icon solid fa-reply" tabindex="{(comment.id*10)+1}" style="color:gray;" id=reply_button{comment.id}" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Log in to Reply"></a></div></div></div>''')
     modules = like_counter_module+like_button_module+reply_module
-    delete_module = Markup(f'''<div class="row col-sm-5 col-lg-4" ><div class="col-2"><div class="hvr-grow"><a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="color:gray;padding-left:0.5em;"></a></div></div>''')
+    delete_module = Markup(f'''<div class="row col-sm-8 col-lg-4" ><div class="col-2"><div class="hvr-grow"><a href="{url_for('delete_comment', comment_id=comment.id) }" class="icon fa-trash-alt" style="color:gray;padding-left:0.5em;"></a></div></div>''')
     try:
         if current_user == comment.author or current_user.id == 1:
             modules+=delete_module
@@ -731,9 +731,9 @@ def HTML_comment_constructor(comment):
         pass
     this_comment_children = hide_reply_insert(comment.id)
     if current_user.is_authenticated:
-        hide_replies_button = Markup(f'''<div class="col-2"><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"></a></div></div><div class="col-4 col-sm-6" style="font-size: 10pt;margin-top:3px;margin-left:-1em" id="reply_text{comment.id}">Hide Replies</div></div>''')
+        hide_replies_button = Markup(f'''<div class="col-4 col-sm-6""><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"> Hide Replies</a></div></div></div>''')
     else:
-        hide_replies_button = Markup(f'''<div class="row col-sm-5 col-lg-4"><div class="col-2"><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"></a></div></div><div class="col-4 col-sm-6"" style="font-size: 10pt;margin-top:3px;margin-left:3px" id="reply_text{comment.id}">Hide Replies</div></div>''')
+        hide_replies_button = Markup(f'''<div class="row col-sm-5 col-lg-4"><div class="col-4 col-sm-6""><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white;margin-left:7px" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"> Hide Replies</a></div></div></div>''')
     html_starter+=modules+hide_replies_button
     if comment.author == None:
         deleted_commenter = Markup('<div>[User Account Deleted]</div>')
