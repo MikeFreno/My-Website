@@ -730,7 +730,7 @@ def HTML_comment_constructor(comment):
     except:
         pass
     this_comment_children = hide_reply_insert(comment.id)
-    if current_user.is_authenticated:
+    if current_user.id == comment.author.id or current_user.id == 1:
         hide_replies_button = Markup(f'''<div class="col-4 col-sm-6""><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"> Hide Replies</a></div></div></div>''')
     else:
         hide_replies_button = Markup(f'''<div class="row col-sm-5 col-lg-4"><div class="col-4 col-sm-6""><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white;margin-left:7px" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"> Hide Replies</a></div></div></div>''')
@@ -749,7 +749,7 @@ def HTML_comment_constructor(comment):
         commenter = Markup(f'''<a href="{ url_for('user_page', user_id=comment.author.id) }" class="user-link">- @{ comment.author.name }</a>''')
         html_with_commenter = html_with_commenter_image + commenter
     replyform = CommentReplyForm()
-    comment_reply_box = Markup(f'''</div></div><div class="justify-content-center" style="border-left:none"><form class="needs-validation" style="display:none;" id="{comment.id}" action="" method="post" novalidate>{ replyform.csrf_token() }{ replyform.parent_comment(value=comment.id) }<div class="col-lg-8"><div class="form-group">{ replyform.body.label }<textarea class="form-control" name="comment_reply" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)" required></textarea><div class="invalid-feedback">Please include a message.</div></div><br></div><div class="col-3">{ replyform.reply_submit(class_="btn btn-dark") }</div></form></div>''')
+    comment_reply_box = Markup(f'''</div></div><div class="justify-content-center" style="border-left:none"><form class="needs-validation" style="display:none;" id="{comment.id}" action="" method="post" novalidate>{ replyform.csrf_token() }{ replyform.parent_comment(value=comment.id) }<div class="col-lg-8"><div class="form-group">Reply to @{comment.author.name}<textarea class="form-control" name="comment_reply" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)" required></textarea><div class="invalid-feedback">Please include a message.</div></div><br></div><div class="col-3">{ replyform.reply_submit(class_="btn btn-dark") }</div></form></div>''')
     comment_with_reply=html_with_commenter+comment_reply_box
     return comment_with_reply
 
@@ -804,7 +804,10 @@ def gravatar_gen(email):
     g = G(email)
     return g.get_image(size=100,default='identicon')
 
+
 if __name__ == '__main__':
     from waitress import serve
+    print("Running at")
+    print("http://localhost:8080/ http://127.0.0.1:8080")
     server_port = os.environ.get('PORT', '8080')
     serve(app, host="0.0.0.0", port=server_port)
