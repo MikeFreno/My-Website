@@ -684,14 +684,9 @@ def reducer(comments, children_construct,n):
                 this_top_HTML = HTML_comment_constructor(this_top)
                 styled = Markup(f'''<li style="margin-left:{10+(n*4)}vw;margin-right:10vw;"><div class="vl">{this_top_HTML}</div></li>''')
                 children_construct +=styled
-                grandchild_fix = HTML_comment_constructor(children['children'][0]['comment'])
-                styled = Markup(f'''<li style="margin-left:{10+((n+1)*4)}vw;margin-right:10vw;"><div class="vl">{grandchild_fix}</div></li>''')
-                children_construct+=styled
-                children_construct+=reducer(children['children'][0],'',n+1)
-                #this is an ugly fix
                 try:
-                    if children['children'][1]['comment']:
-                        for x in range(1, len(children['children'])):
+                    if children['children'][0]['comment']:
+                        for x in range(0, len(children['children'])):
                             this_grand = HTML_comment_constructor(children['children'][x]['comment'])
                             styled = Markup(f'''<li style="margin-left:{10 + ((n+1) * 4)}vw;margin-right:10vw;"><div class="vl">{this_grand}</div></li>''')
                             children_construct += styled
