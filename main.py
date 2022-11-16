@@ -518,6 +518,7 @@ def show_project(proj_id):
                 parent_project=requested_project,
                 likes=0,
                 parent_comment=None,
+                parent_chain="",
             )
             db.session.add(new_comment)
             new = Comment.query.filter(Comment.body == new_comment.body).order_by(Comment.id.desc()).first()
@@ -532,6 +533,8 @@ def show_project(proj_id):
                 likes=0,
                 parent_comment=request.form['parent_comment'],
             )
+            the_parent_comment = Comment.query.get(new_reply.parent_comment)
+            new_reply.parent_chain = the_parent_comment.parent_chain + f"{the_parent_comment.id};"
             db.session.add(new_reply)
             new = Comment.query.filter(Comment.body == new_reply.body).order_by(Comment.id.desc()).first()
             like_comment_on_post(new)
@@ -634,7 +637,7 @@ def string_to_list(string):
 
 def hide_reply_insert(comment_id):
     if Comment.query.get(comment_id).post_id == None:
-        all_comments = Comment.query.filter(Comment.project_id==Comment.query.get(comment_id).proj_id)
+        all_comments = Comment.query.filter(Comment.project_id==Comment.query.get(comment_id).project_id)
     else:
         all_comments = Comment.query.filter(Comment.post_id==Comment.query.get(comment_id).post_id)
     comments_to_hide = []
@@ -751,7 +754,7 @@ def HTML_comment_constructor(comment):
         commenter = Markup(f'''<a href="{ url_for('user_page', user_id=comment.author.id) }" class="user-link">- @{ comment.author.name }</a>''')
         html_with_commenter = html_with_commenter_image + commenter
     replyform = CommentReplyForm()
-    comment_reply_box = Markup(f'''</div><div class="justify-content-center" style="border-left:none"><form class="needs-validation" style="display:none;" id="{comment.id}" action="" method="post" novalidate>{ replyform.csrf_token() }{ replyform.parent_comment(value=comment.id) }<div class="col-lg-8"><div class="form-group">{ replyform.body.label }<textarea class="form-control" name="comment_reply" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)" required></textarea><div class="invalid-feedback">Please include a message.</div></div><br></div><div class="col-3">{ replyform.reply_submit(class_="btn btn-dark") }</div></form></div>''')
+    comment_reply_box = Markup(f'''</div></div><div class="justify-content-center" style="border-left:none"><form class="needs-validation" style="display:none;" id="{comment.id}" action="" method="post" novalidate>{ replyform.csrf_token() }{ replyform.parent_comment(value=comment.id) }<div class="col-lg-8"><div class="form-group">{ replyform.body.label }<textarea class="form-control" name="comment_reply" rows="3" style="color:white;background-color:rgba(27, 31, 34, 0.85)" required></textarea><div class="invalid-feedback">Please include a message.</div></div><br></div><div class="col-3">{ replyform.reply_submit(class_="btn btn-dark") }</div></form></div>''')
     comment_with_reply=html_with_commenter+comment_reply_box
     return comment_with_reply
 
