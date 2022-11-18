@@ -730,9 +730,10 @@ def HTML_comment_constructor(comment):
     except:
         pass
     this_comment_children = hide_reply_insert(comment.id)
-    if current_user.id == comment.author.id or current_user.id == 1:
-        hide_replies_button = Markup(f'''<div class="col-4 col-sm-6""><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"> Hide Replies</a></div></div></div>''')
-    else:
+    try:
+        if current_user.id == comment.author.id or current_user.id == 1:
+            hide_replies_button = Markup(f'''<div class="col-4 col-sm-6""><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"> Hide Replies</a></div></div></div>''')
+    except:
         hide_replies_button = Markup(f'''<div class="row col-sm-5 col-lg-4"><div class="col-4 col-sm-6""><div class="hvr-grow"><a class="icon solid fa-eye" style="color:white;margin-left:7px" onclick="handleReplyVisibility({comment.id})" id="hide_reply{comment.id}" value="{this_comment_children}"> Hide Replies</a></div></div></div>''')
     html_starter+=modules+hide_replies_button
     if comment.author == None:
@@ -808,6 +809,7 @@ def gravatar_gen(email):
 if __name__ == '__main__':
     from waitress import serve
     print("Running at")
-    print("http://localhost:8080/ http://127.0.0.1:8080")
-    server_port = os.environ.get('PORT', '8080')
+    this_port = "8080"
+    print(f"http://localhost:{this_port}/ http://127.0.0.1:{this_port}")
+    server_port = os.environ.get('PORT', this_port)
     serve(app, host="0.0.0.0", port=server_port)
