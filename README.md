@@ -1,5 +1,5 @@
 # My_Website
-My Professional Website<br><hr><br><br>
+My Professional Website made with Bootstrap and Flask<br><hr><br><br>
 Comment Section - logged in view<hr>
 <img width="1440" alt="Screenshot 2022-11-16 at 11 43 46 AM" src="https://user-images.githubusercontent.com/108227314/202241339-d90759da-8489-4234-9eb1-c1c563152c8e.png">
 Comment Section - logged out view<hr>
