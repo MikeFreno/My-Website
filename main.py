@@ -384,9 +384,20 @@ def edit_post(post_id):
         author=current_user,
     )
     if edit_form.validate_on_submit():
+        if 'file' not in request.files:
+            pass
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        if edit_form.cover_photo.data == '':
+            option_result = f'static/uploads/{filename}'
+        else:
+            option_result = edit_form.cover_photo.data
+
         post.title = edit_form.title.data
         post.subtitle = edit_form.subtitle.data
-        post.img_url = edit_form.cover_photo.data
+        post.cover_photo = option_result
         post.author = current_user
         post.body = edit_form.body.data
         db.session.commit()
@@ -486,6 +497,16 @@ def edit_project(proj_id):
         author=current_user,
     )
     if edit_form.validate_on_submit():
+        if 'file' not in request.files:
+            pass
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        if edit_form.cover_photo.data == '':
+            option_result = f'static/uploads/{filename}'
+        else:
+            option_result = edit_form.cover_photo.data
         project.title = edit_form.title.data
         project.subtitle = edit_form.subtitle.data
         project.cover_photo = edit_form.cover_photo.data
