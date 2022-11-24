@@ -509,7 +509,7 @@ def edit_project(proj_id):
             option_result = edit_form.cover_photo.data
         project.title = edit_form.title.data
         project.subtitle = edit_form.subtitle.data
-        project.cover_photo = edit_form.cover_photo.data
+        project.cover_photo = option_result
         project.author = current_user
         project.body = edit_form.body.data
         db.session.commit()
