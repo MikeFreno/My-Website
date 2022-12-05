@@ -1,6 +1,7 @@
 import os
 from datetime import date, datetime
 from functools import wraps
+from dotenv import load_dotenv, find_dotenv
 
 from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_bootstrap import Bootstrap
@@ -11,14 +12,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from libgravatar import Gravatar as G
 from markupsafe import Markup
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import *
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from wtforms import StringField, SubmitField, PasswordField, BooleanField, HiddenField
 from wtforms.validators import DataRequired, Length
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
 from image_var import image
 
@@ -777,19 +778,27 @@ def HTML_comment_constructor(comment):
 
 
 def send_contact_email(name, email, message):
-    message = Mail(
-        from_email='michael@freno.me',
-        to_emails='michaelt.freno@gmail.com',
-        subject='Website Contact Request',
-        html_content=f'name: {name}<br>email: {email}<br>message: {message}')
+    configuration = sib_api_v3_sdk.Configuration()
+    load_dotenv(find_dotenv())
+    KEY = os.environ["SENDINBLUE_KEY"]
+
+    configuration.api_key['api-key'] = KEY
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+
+    subject = 'Website Contact Request'
+    html_content = f'name: {name}<br>email: {email}<br>message: {message}'
+    sender = {"name": "Michael Freno", "email": 'michael@freno.me'}
+    to = [{"email": 'michaelt.freno@gmail.com', "name": "Michael Freno"}]
+    cc = [{"email": "michael@freno.me", "name": "Michael Freno"}]
+    reply_to = {"name": "Michael Freno", "email": 'michael@freno.me',}
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to,  cc=cc, reply_to=reply_to,
+                                                   html_content=html_content, sender=sender, subject=subject)
+
     try:
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-    except Exception as e:
-        print(e)
+        api_response = api_instance.send_transac_email(send_smtp_email)
+        print(api_response)
+    except ApiException as e:
+        print("Exception when calling SMTPApi->send_transac_email: %s\n" % e)
 
 def like_comment_on_post(comment):
     comment.likes+=1
@@ -803,28 +812,31 @@ def like_comment_on_post(comment):
 
 
 def send_registration_email(name, email):
-    message = Mail(
-        from_email='michael@freno.me',
-        to_emails=email,
-        subject='Thank you!',
-        html_content=f'<h4 style="text-align: center;"><img src="data:image/jpeg;base64,{image}"'
-                     f'alt="logo" style="height:50px;width:50px">Mike Freno</h4><br><h2>Hello {name},<br> Thanks for registering for my website!</h2><br> '
-                     f'No other emails will be sent to you, '
-                     f' outside of responses back for inquiry and any emailers that you decide to opt-in to (yet to be '
-                     f'implemented as of writing), of which you can of course opt out of at anytime. <br><br> Thanks '
-                     f'again!<br><br> -Michael Freno')
+    configuration = sib_api_v3_sdk.Configuration()
+    load_dotenv(find_dotenv())
+    KEY = os.environ["SENDINBLUE_KEY"]
+    configuration.api_key['api-key'] = KEY
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    subject = 'Thank you!'
+    sender = {"name": "Michael Freno", "email": 'michael@freno.me'}
+    reply_to = {"name": "Michael Freno", "email": 'michael@freno.me'}
+    templateId = 1
+    params = {'FIRSTNAME': name}
+    to = [{"email": email, "name": name}]
+    attachment = [{"content":f"{image}",
+                   "name":"logo.jpg"}]
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, reply_to=reply_to, attachment=attachment,
+                                                   template_id=templateId, params=params, sender=sender, subject=subject)
     try:
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-    except Exception as e:
-        print(e.message)
+        api_response = api_instance.send_transac_email(send_smtp_email)
+        print(api_response)
+    except ApiException as e:
+        print("Exception when calling SMTPApi->send_transac_email: %s\n" % e)
 
 def gravatar_gen(email):
     g = G(email)
     return g.get_image(size=100,default='identicon')
+
 
 
 if __name__ == '__main__':
